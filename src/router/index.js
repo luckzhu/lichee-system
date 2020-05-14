@@ -61,33 +61,33 @@ export const constantRoutes = [
     meta: { title: '广东荔枝', icon: 'litchee' },
     children: [
       {
-        path: 'info',
-        name: 'Info',
-        component: () => import('@/views/dashboard/index'),
+        path: 'base',
+        name: 'Base',
+        component: () => import('@/views/lichee/base'),
         meta: { title: '基地信息登记', icon: 'info' }
       },
       {
         path: 'brand',
         name: 'Brand',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/lichee/brand'),
         meta: { title: '品牌标识申领', icon: 'brand' }
       },
       {
         path: 'contract',
         name: 'Contract',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/lichee/contract'),
         meta: { title: '合同备案登记', icon: 'register' }
       },
       {
         path: 'monitor',
         name: 'Monitor',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/lichee/monitor'),
         meta: { title: '生产供应监测', icon: 'monitor' }
       },
       {
         path: 'subsidy',
         name: 'Subsidy',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/lichee/subsidy'),
         meta: { title: '物流补助核准', icon: 'subsidy' }
       }
     ]
