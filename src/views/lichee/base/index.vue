@@ -1,15 +1,15 @@
 <template>
   <div>
-    <el-button type="primary" class="add" @click="dialogFormVisible = true">新增生产基地</el-button>
+    <el-button type="primary" class="add" @click="addBase">新增生产基地</el-button>
     <lb-table :column="tableData.column" :data="tableData.data" border stripe align="center" />
 
     <!-- 新增基地表单 -->
-    <div class="addDailog">
+    <!-- <div class="addDailog">
       <el-dialog
         title="新增生产基地"
         :close-on-click-modal="false"
         :visible.sync="dialogFormVisible"
-        width="40%"
+        width="50%"
         top="10vh"
         center
       >
@@ -19,23 +19,26 @@
           <el-button type="primary" @click="submit">确 定</el-button>
         </div>
       </el-dialog>
-    </div>
+    </div>-->
+
+    <AddBaseFormDialog ref="addBaseForm" />
   </div>
 </template>
 
 <script>
 import LbTable from '@/components/LbTable'
-import AddBaseForm from './components/AddBaseForm'
+// import AddBaseForm from './components/AddBaseForm'
+import AddBaseFormDialog from './components/AddBaseFormDialog'
 
 export default {
   name: 'Base',
   components: {
     LbTable,
-    AddBaseForm
+    // AddBaseForm,
+    AddBaseFormDialog
   },
   data() {
     return {
-      addForm: {},
       tableData: {
         column: [
           {
@@ -167,16 +170,14 @@ export default {
             exportFiling: 1
           }
         ]
-      },
-      dialogFormVisible: true,
-      formLabelWidth: '120px'
+      }
     }
   },
   methods: {
-    submit() {
-      console.log(this.$refs.addBaseForm)
-      this.$refs.addBaseForm.handleSubmit()
-      // this.dialogFormVisible = false
+    addBase() {
+      console.log(111)
+      this.$refs.addBaseForm.$emit('open')
+      console.log(22)
     }
   }
 }

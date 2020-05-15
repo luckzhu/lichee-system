@@ -1,25 +1,26 @@
 <template>
-  <ele-form
-    v-model="formData"
-    :form-desc="formDesc"
-    :request-fn="handleSubmit"
-    :rules="rules"
-    label-position="left"
-    :is-responsive="false"
-    :is-show-back-btn="false"
-    :is-show-cancel-btn="true"
-    @request-success="handleSuccess"
-  />
+  <div class="form-wrapper">
+    <ele-form-dialog
+      v-model="formData"
+      :form-desc="formDesc"
+      :request-fn="handleSubmit"
+      :rules="rules"
+      label-position="left"
+      :is-responsive="false"
+      :visible.sync="dialogFormVisible"
+      title="新增生产基地"
+      :dialog-attrs="{ top: '8vh','close-on-click-modal':false }"
+      @request-success="handleSuccess"
+    />
+  </div>
 </template>
 
 <script>
-import EleForm from 'vue-ele-form'
 export default {
-  components: {
-    EleForm
-  },
+  name: 'FormDialog',
   data() {
     return {
+      dialogFormVisible: false,
       // 表单数据
       formData: {},
       formDesc: {
@@ -301,21 +302,33 @@ export default {
       rules: {}
     }
   },
+  created() {
+    this.$on('open', () => {
+      this.dialogFormVisible = true
+    })
+  },
   methods: {
     handleSubmit(data) {
-      // eslint-disable-next-line no-console
       console.log(data)
-      return Promise.resolve()
+      // 模拟异步请求
+      return new Promise(resolve => {
+        resolve(data)
+      })
     },
-    handleSuccess() {
+    handleSuccess(data) {
+      // 关闭弹窗
+      this.dialogFormVisible = false
+      // 重置formData
+      this.formData = {}
       this.$message.success('创建成功')
     }
   }
 }
 </script>
 
-<style>
-body {
+<style lang="scss">
+.form-wrapper {
   background-color: #efefef;
+  width: 50%;
 }
 </style>
