@@ -1,5 +1,8 @@
 <template>
   <div class="login-container">
+    <div class="title-container">
+      <h3 class="title">广东荔枝区域公用品牌管理系统</h3>
+    </div>
     <el-form
       ref="loginForm"
       :model="loginForm"
@@ -8,9 +11,6 @@
       auto-complete="on"
       label-position="left"
     >
-      <div class="title-container">
-        <h3 class="title">广东荔枝系统</h3>
-      </div>
 
       <el-form-item prop="username">
         <span class="svg-container">
@@ -64,7 +64,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'Login',
   data() {
@@ -141,6 +140,12 @@ $cursor: #fff;
 /* reset element-ui css */
 .login-container {
   background-image: url("../../assets/loginBg.png");
+  display: flex;
+  // justify-content: center;
+  padding-top: 140px;
+  align-items: center;
+  flex-direction: column;
+
   .el-input {
     display: inline-block;
     height: 47px;
@@ -187,7 +192,7 @@ $light_gray: #eee;
     position: relative;
     width: 520px;
     max-width: 100%;
-    padding: 160px 35px 0;
+
     margin: 0 auto;
     overflow: hidden;
   }
@@ -214,15 +219,14 @@ $light_gray: #eee;
 
   .title-container {
     position: relative;
-
     .title {
-      font-size: 40px;
+      font-size: 60px;
+
       letter-spacing: 4px;
       color: #b33038;
-
-      margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
+      white-space: nowrap;
     }
   }
 

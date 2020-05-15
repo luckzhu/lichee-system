@@ -3,11 +3,11 @@
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">{{ title }} </h1>
+        <p v-else class="sidebar-title">{{ title }} </p>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <p class="sidebar-title">{{ title }} </p>
       </router-link>
     </transition>
   </div>
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: '广东荔枝系统',
+      title: '广东荔枝区域公用品牌',
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
       logo: require('@/assets/logo/lichee.png')
     }
@@ -68,7 +68,7 @@ export default {
       color: #fff;
       font-weight: 600;
       line-height: 50px;
-      font-size: 18px;
+      font-size: 12px;
       letter-spacing: 2px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;

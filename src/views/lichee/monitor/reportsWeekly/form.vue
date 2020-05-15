@@ -39,6 +39,7 @@ export default {
           {
             prop: 'onMarket',
             label: '是否上市',
+
             render: (h, scope) => {
               return (
                 <div>
@@ -52,10 +53,12 @@ export default {
           },
           {
             label: '本周上市情况',
+
             children: [
               {
                 label: '基地本周上市量（公斤）',
                 prop: 'MarketVolume_thisWeek',
+                align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
@@ -72,6 +75,7 @@ export default {
               {
                 label: '基地田头大宗最高价（元/公斤）',
                 prop: 'highestPrice_thisWeek',
+                align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
@@ -88,6 +92,7 @@ export default {
               {
                 label: '基地田头大宗最低价（元/公斤）',
                 prop: 'lowestPrice_thisWeek',
+                align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
@@ -109,6 +114,7 @@ export default {
               {
                 label: '预计下周价格（元/公斤）',
                 prop: 'price_nextWeek',
+                align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
@@ -125,6 +131,7 @@ export default {
               {
                 label: '预计下周基地上市量（公斤）',
                 prop: 'MarketVolume_nextWeek',
+                align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>

@@ -17,8 +17,7 @@ export default {
   data() {
     return {
       tabs: [
-        { label: '基地周报', name: 'reports-weekly' },
-        { label: '基地月报', name: '' }
+        { label: '基地周报', name: 'reports-weekly' }
       ]
     }
   }

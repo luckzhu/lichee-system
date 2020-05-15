@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: '广东荔枝系统',
+  title: '广东荔枝区域公用品牌管理系统',
 
   /**
    * @type {boolean} true | false
