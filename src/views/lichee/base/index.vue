@@ -29,6 +29,8 @@
 import LbTable from '@/components/LbTable'
 // import AddBaseForm from './components/AddBaseForm'
 import AddBaseFormDialog from './components/AddBaseFormDialog'
+import { queryBase } from '@/api/base'
+import { stateMap } from '@/utils/submit'
 
 export default {
   name: 'Base',
@@ -81,61 +83,34 @@ export default {
             prop: 'classifyingEquipments',
             label: '分级设备',
             formatter: row => (row.classifyingEquipments ? '有' : '无')
-            // render: (h, scope) => {
-            //   return (
-            //     <div>
-            //       <el-radio-group v-model={scope.row.classifyingEquipments}>
-            //         <el-radio label={1}>有</el-radio>
-            //         <el-radio label={0}>无</el-radio>
-            //       </el-radio-group>
-            //     </div>
-            //   )
-            // }
           },
           {
             prop: 'balingEquipment',
             label: '打包设备',
             formatter: row => (row.balingEquipment ? '有' : '无')
-            // render: (h, scope) => {
-            //   return (
-            //     <div>
-            //       <el-radio-group v-model={scope.row.balingEquipment}>
-            //         <el-radio label={1}>有</el-radio>
-            //         <el-radio label={0}>无</el-radio>
-            //       </el-radio-group>
-            //     </div>
-            //   )
-            // }
           },
           {
             prop: 'expressSite',
             label: '快递驻点',
             formatter: row => (row.expressSite ? '有' : '无')
-            // render: (h, scope) => {
-            //   return (
-            //     <div>
-            //       <el-radio-group v-model={scope.row.expressSite}>
-            //         <el-radio label={1}>有</el-radio>
-            //         <el-radio label={0}>无</el-radio>
-            //       </el-radio-group>
-            //     </div>
-            //   )
-            // }
           },
           {
             prop: 'exportFiling',
             label: '出口备案',
             formatter: row => (row.exportFiling ? '有' : '无')
-            // render: (h, scope) => {
-            //   return (
-            //     <div>
-            //       <el-radio-group v-model={scope.row.exportFiling}>
-            //         <el-radio label={1}>有</el-radio>
-            //         <el-radio label={0}>无</el-radio>
-            //       </el-radio-group>
-            //     </div>
-            //   )
-            // }
+          },
+          {
+            prop: 'state',
+            label: '状态',
+            render: (h, scope) => {
+              return (
+                <div>
+                  <el-tag type={stateMap[scope.row.state].type}>
+                    {stateMap[scope.row.state].label}
+                  </el-tag>
+                </div>
+              )
+            }
           }
         ],
         data: [
@@ -152,12 +127,13 @@ export default {
             classifyingEquipments: 1,
             balingEquipment: 0,
             expressSite: 1,
-            exportFiling: 1
+            exportFiling: 1,
+            state: 1
           },
           {
             enterpriseName: '老字号',
             cityAndCounty: '广东省天河区',
-            address: '农科院创新大楼231',
+            address: '农科院创新大楼230',
             contact: '二傻子',
             phone: '12345678900',
             area: 20,
@@ -167,11 +143,17 @@ export default {
             classifyingEquipments: 1,
             balingEquipment: 0,
             expressSite: 1,
-            exportFiling: 1
+            exportFiling: 1,
+            state: 1
           }
         ]
       }
     }
+  },
+  mounted() {
+    queryBase().then(res => {
+      console.log(res)
+    })
   },
   methods: {
     addBase() {
