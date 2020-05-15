@@ -41,7 +41,7 @@ export default {
         callback()
       }
     }
-    const mobile = (rule, value, callback) => {
+    const phone = (rule, value, callback) => {
       const mobileReg = /^(?:(?:\+|00)86)?1[3-9]\d{9}$/
       if (value !== '' && !mobileReg.test(value)) {
         callback(new Error('请输入正确的手机号码'))
@@ -56,10 +56,15 @@ export default {
       formDesc: {
         unitName: {
           type: 'input',
-          label: '单位名称',
+          label: '企业名称',
           required: true // 必填简写
         },
-        user_name: {
+        orgCode: {
+          type: 'input',
+          label: '统一社会信用代码',
+          required: true // 必填简写
+        },
+        account: {
           type: 'input',
           label: '用户名',
           required: true
@@ -74,7 +79,7 @@ export default {
           label: '重复密码',
           required: true
         },
-        unitType: {
+        roleId: {
           type: 'select',
           label: '单位类型',
           required: true,
@@ -88,47 +93,30 @@ export default {
           label: '姓名',
           required: true
         },
-        sex: {
-          type: 'radio',
-          label: '性别',
-          options: [
-            { text: '男士', value: '男士' },
-            { text: '女士', value: '女士' }
-          ]
-        },
         phone: {
-          type: 'input',
-          label: '联系电话'
-        },
-        mobile: {
           type: 'input',
           label: '联系手机',
           required: true
-        },
-        email: {
-          type: 'input',
-          label: '邮箱',
-          required: true
-        },
-        vcode: {
-          type: 'input',
-          label: '验证码',
-          layout: 12,
-          required: true
-        },
-        vcodeImage: {
-          type: 'image',
-          layout: 12,
-          default: 'http://gdmpxt.org:80/ValidateCodeServlet',
-          style: {
-            // 可以在此调整大小
-            width: '80px',
-            height: '32px'
-          },
-          attrs: {
-            isShowPreview: false // 默认值开启图片预览功能，可以设置为false，关闭
-          }
         }
+        // vcode: {
+        //   type: 'input',
+        //   label: '验证码',
+        //   layout: 12,
+        //   required: true
+        // },
+        // vcodeImage: {
+        //   type: 'image',
+        //   layout: 12,
+        //   default: 'http://gdmpxt.org:80/ValidateCodeServlet',
+        //   style: {
+        //     // 可以在此调整大小
+        //     width: '80px',
+        //     height: '32px'
+        //   },
+        //   attrs: {
+        //     isShowPreview: false // 默认值开启图片预览功能，可以设置为false，关闭
+        //   }
+        // }
       },
       rules: {
         unitName: [
@@ -156,7 +144,7 @@ export default {
           }
         ],
         rePassword: [{ validator: validateRePassword, trigger: 'blur' }],
-        mobile: [{ validator: mobile, trigger: 'blur' }],
+        phone: [{ validator: phone, trigger: 'blur' }],
         email: [
           {
             type: 'email',

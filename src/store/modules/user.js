@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import { viewCode2Roles } from '@/utils/viewCode2Roles'
 
 const getDefaultState = () => {
   return {
@@ -36,7 +37,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ account: username.trim(), pwd: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -51,13 +52,13 @@ const actions = {
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
-        const { data } = response
+        const data = response.rows
 
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('未获取到角色列表，请重新登录或联系管理员')
         }
-
-        const { roles, name, avatar } = data
+        const { name, avatar } = data
+        const roles = viewCode2Roles(data)
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -67,7 +68,7 @@ const actions = {
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
-        resolve(data)
+        resolve({ roles, name })
       }).catch(error => {
         reject(error)
       })
