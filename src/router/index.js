@@ -85,6 +85,13 @@ export const constantRoutes = [
         meta: { title: '生产供应监测', icon: 'monitor' }
       },
       {
+        path: 'weeklyForm',
+        name: 'WeeklyForm',
+        hidden: true,
+        component: () => import('@/views/lichee/monitor/reportsWeekly/form'),
+        meta: { title: '周报' }
+      },
+      {
         path: 'subsidy',
         name: 'Subsidy',
         component: () => import('@/views/lichee/subsidy'),

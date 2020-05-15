@@ -12,7 +12,7 @@
 export default {
   name: 'Monitor',
   components: {
-    ReportsWeekly: () => import('./components/reports-weekly')
+    ReportsWeekly: () => import('./reportsWeekly')
   },
   data() {
     return {

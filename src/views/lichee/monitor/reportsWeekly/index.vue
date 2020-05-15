@@ -1,11 +1,19 @@
 <template>
   <div>
-    <lb-table :column="tableData.column" :data="tableData.data" :merge="['issue']" border stripe align="center" />
+    <lb-table
+      :column="tableData.column"
+      :data="tableData.data"
+      :merge="['issue']"
+      border
+      stripe
+      align="center"
+    />
+    <router-view />
   </div>
 </template>
 
 <script>
-import LbTable from '@/components/lb-table/lb-table'
+import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
 
 export default {
@@ -73,6 +81,7 @@ export default {
         ],
         data: [
           {
+            id: 1,
             issue: '20200506',
             period: '0430 ~ 0506',
             deadline: '0508',
@@ -81,6 +90,7 @@ export default {
             state: -1
           },
           {
+            id: 2,
             issue: '20200506',
             period: '0430 ~ 0506',
             deadline: '0508',
@@ -89,6 +99,7 @@ export default {
             state: 1
           },
           {
+            id: 3,
             issue: '20200513',
             period: '0507 ~ 0513',
             deadline: '0515',
@@ -97,6 +108,7 @@ export default {
             state: 2
           },
           {
+            id: 4,
             issue: '20200513',
             period: '0507 ~ 0513',
             deadline: '0515',
@@ -110,6 +122,12 @@ export default {
   },
   methods: {
     handleEdit(index, row) {
+      const { id } = row
+
+      this.$router.push({
+        path: '/lichee/weeklyForm',
+        query: { id }
+      })
       console.log(index, row)
     }
   }
