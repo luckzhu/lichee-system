@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import LbRender from './lb-render'
+import LbRender from './LbRender'
 import forced from './forced.js'
 export default {
   name: 'LbColumn',

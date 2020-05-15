@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import LbColumn from './lb-column'
+import LbColumn from './LbColumn'
 export default {
   components: {
     LbColumn

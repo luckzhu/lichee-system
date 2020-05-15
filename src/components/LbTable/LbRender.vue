@@ -4,7 +4,9 @@ export default {
   name: 'LbRender',
   functional: true,
   props: {
+    // eslint-disable-next-line
     scope: Object,
+    // eslint-disable-next-line
     render: Function
   },
   render: (h, ctx) => {

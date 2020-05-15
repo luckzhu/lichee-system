@@ -1,5 +1,5 @@
 build/*.js
 src/assets
-src/components/lb-table
+src/components/LbTable
 public
 dist
