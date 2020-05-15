@@ -4,7 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 /* Layout */
-import Layout from '@/layout'
+import Layout from '@/layout2'
 
 /**
  * Note: sub-menu only appear when route children.length >= 1
@@ -61,7 +61,7 @@ export const constantRoutes = [
   {
     path: '/lichee',
     component: Layout,
-    redirect: '/lichee/info',
+    redirect: '/lichee/base',
     meta: { title: '广东荔枝', icon: 'litchee' },
     children: [
       {
