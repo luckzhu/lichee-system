@@ -8,17 +8,28 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo(params) {
   return request({
-    url: '/auth/queryRoles',
+    url: '/user/getMyInfo',
     method: 'get',
-    params: { token }
+    params
   })
 }
 
-export function logout() {
+// 获取单位类型,角色列表
+export function queryRoles(params) {
   return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
+    url: '/auth/queryRoles',
+    method: 'get',
+    params
+  })
+}
+
+// 注册register
+export function register(data) {
+  return request({
+    url: '/auth/sign',
+    method: 'post',
+    data
   })
 }

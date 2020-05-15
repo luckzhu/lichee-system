@@ -15,6 +15,7 @@
         :is-show-cancel-btn="false"
         submit-btn-text="注册"
         @request-success="handleSuccess"
+        @request-error="handleError"
       />
       <div class="tips">
         <router-link to="/login">
@@ -26,11 +27,11 @@
 </template>
 
 <script>
-import EleForm from 'vue-ele-form'
+import { queryRegion } from '@/api/normal'
+import { register } from '@/api/user'
+
 export default {
-  components: {
-    EleForm
-  },
+  name: 'Register',
   data() {
     const validateRePassword = (rule, value, callback) => {
       if (value === '') {
@@ -49,7 +50,14 @@ export default {
         callback()
       }
     }
-
+    const orgCode = (rule, value, callback) => {
+      const orgCodeReg = /^[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}$/
+      if (value !== '' && !orgCodeReg.test(value)) {
+        callback(new Error('请输入正确的统一社会信用代码'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 表单数据
       formData: {},
@@ -58,6 +66,37 @@ export default {
           type: 'input',
           label: '企业名称',
           required: true // 必填简写
+        },
+        regionCode: {
+          type: 'cascader',
+          label: '地级市/县（区）',
+          required: true,
+          attrs: {
+            props: {
+              lazy: true,
+              value: 'code',
+              label: 'name',
+              lazyLoad(node, resolve) {
+                const { level } = node
+                if (level === 0) {
+                  queryRegion().then(res => {
+                    const nodes = res.filter(item => item.type === 1)
+                    resolve(nodes)
+                  })
+                } else {
+                  const { code } = node.data
+                  queryRegion({ code }).then(res => {
+                    const nodes = res.map(item => ({
+                      code: item.code,
+                      name: item.name,
+                      leaf: true
+                    }))
+                    resolve(nodes)
+                  })
+                }
+              }
+            }
+          }
         },
         orgCode: {
           type: 'input',
@@ -145,6 +184,7 @@ export default {
         ],
         rePassword: [{ validator: validateRePassword, trigger: 'blur' }],
         phone: [{ validator: phone, trigger: 'blur' }],
+        orgCode: [{ validator: orgCode, trigger: 'blur' }],
         email: [
           {
             type: 'email',
@@ -157,12 +197,30 @@ export default {
   },
   methods: {
     handleSubmit(data) {
-      // eslint-disable-next-line no-console
-      console.log(data)
-      return Promise.resolve()
+      const { regionCode } = data
+      data.regionCode = regionCode[regionCode.length - 1]
+      delete data.rePassword
+
+      return new Promise(async(resolve, reject) => {
+        try {
+          const res = await register(data)
+          if (res.code === 200) {
+            resolve(data)
+          } else {
+            reject(res.data.info)
+          }
+        } catch (error) {
+          reject(new Error(error))
+        }
+      })
     },
-    handleSuccess() {
-      this.$message.success('创建成功')
+
+    handleSuccess(data) {
+      this.$router.push('/')
+    },
+    // eslint-disable-next-line handle-callback-err
+    handleError(error) {
+      this.$message('注册失败,请重试或联系管理员')
     }
   }
 }

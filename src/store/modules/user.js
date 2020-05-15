@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import { viewCode2Roles } from '@/utils/viewCode2Roles'
@@ -51,14 +51,13 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const data = response.rows
+      getInfo().then(response => {
+        const data = response.data.info
 
         if (!data) {
           reject('未获取到角色列表，请重新登录或联系管理员')
         }
-        const { name, avatar } = data
-        const roles = viewCode2Roles(data)
+        const { roles, name } = viewCode2Roles(data)
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -67,8 +66,8 @@ const actions = {
 
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve({ roles, name })
+        // commit('SET_AVATAR', avatar)
+        resolve({ roles, name: '' })
       }).catch(error => {
         reject(error)
       })
@@ -77,17 +76,10 @@ const actions = {
 
   // user logout
   logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        dispatch('tagsView/delAllViews', null, { root: true })
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+    removeToken() // must remove  token  first
+    resetRouter()
+    commit('RESET_STATE')
+    dispatch('tagsView/delAllViews', null, { root: true })
   },
 
   // remove token
