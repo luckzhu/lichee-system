@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'lichee system',
+  title: '广东荔枝系统',
 
   /**
    * @type {boolean} true | false
