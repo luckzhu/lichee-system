@@ -3,7 +3,7 @@
     <div class="issue-info">
       <p>
         填报期号：
-        <span>20200514</span>
+        <span>{{ issue.issue }}</span>
       </p>
       <p>
         生产基地：
@@ -13,14 +13,16 @@
     <lb-table :column="tableData.column" :data="tableData.data" border stripe align="center" />
 
     <footer>
-      <el-button type="primary">保存但不提交</el-button>
-      <el-button type="success">数据无误并提交</el-button>
+      <el-button type="primary" @click="save">保存但不提交</el-button>
+      <el-button type="success" @click="submit">数据无误并提交</el-button>
     </footer>
   </div>
 </template>
 
 <script>
 import LbTable from '@/components/LbTable'
+import { addOrUpdateBaseData, getBaseDataByIssueId } from '@/api/task'
+import { licheeBreedMap } from '@/utils/submit'
 
 export default {
   name: 'Form',
@@ -34,12 +36,14 @@ export default {
           {
             prop: 'breedName',
             label: '品种',
-            width: '80px'
+            width: '80px',
+            formatter: row => {
+              licheeBreedMap.get(row.bId)
+            }
           },
           {
             prop: 'onMarket',
             label: '是否上市',
-
             render: (h, scope) => {
               return (
                 <div>
@@ -53,17 +57,16 @@ export default {
           },
           {
             label: '本周上市情况',
-
             children: [
               {
                 label: '基地本周上市量（公斤）',
-                prop: 'MarketVolume_thisWeek',
+                prop: 'd1',
                 align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
                       <el-input-number
-                        v-model={scope.row.MarketVolume_thisWeek}
+                        v-model={scope.row.d1}
                         controls={false}
                         size='small'
                         disabled={!scope.row.onMarket}
@@ -74,13 +77,13 @@ export default {
               },
               {
                 label: '基地田头大宗最高价（元/公斤）',
-                prop: 'highestPrice_thisWeek',
+                prop: 'd2',
                 align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
                       <el-input-number
-                        v-model={scope.row.MarketVolume_thisWeek}
+                        v-model={scope.row.d2}
                         controls={false}
                         size='small'
                         disabled={!scope.row.onMarket}
@@ -91,13 +94,13 @@ export default {
               },
               {
                 label: '基地田头大宗最低价（元/公斤）',
-                prop: 'lowestPrice_thisWeek',
+                prop: 'd3',
                 align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
                       <el-input-number
-                        v-model={scope.row.MarketVolume_thisWeek}
+                        v-model={scope.row.d3}
                         controls={false}
                         size='small'
                         disabled={!scope.row.onMarket}
@@ -113,13 +116,13 @@ export default {
             children: [
               {
                 label: '预计下周价格（元/公斤）',
-                prop: 'price_nextWeek',
+                prop: 'd4',
                 align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
                       <el-input-number
-                        v-model={scope.row.MarketVolume_thisWeek}
+                        v-model={scope.row.d4}
                         controls={false}
                         size='small'
                         disabled={!scope.row.onMarket}
@@ -130,13 +133,13 @@ export default {
               },
               {
                 label: '预计下周基地上市量（公斤）',
-                prop: 'MarketVolume_nextWeek',
+                prop: 'd5',
                 align: 'center',
                 render: (h, scope) => {
                   return (
                     <div>
                       <el-input-number
-                        v-model={scope.row.MarketVolume_thisWeek}
+                        v-model={scope.row.d5}
                         controls={false}
                         size='small'
                         disabled={!scope.row.onMarket}
@@ -152,20 +155,20 @@ export default {
           {
             breedName: '妃子笑',
             onMarket: 1,
-            MarketVolume_thisWeek: 10,
-            highestPrice_thisWeek: 20,
-            lowestPrice_thisWeek: 30,
-            price_nextWeek: 40,
-            MarketVolume_nextWeek: 15
+            d1: 10,
+            d2: 20,
+            d3: 30,
+            d4: 40,
+            d5: 15
           },
           {
             breedName: '白糖罂',
             onMarket: 1,
-            MarketVolume_thisWeek: 10,
-            highestPrice_thisWeek: 20,
-            lowestPrice_thisWeek: 30,
-            price_nextWeek: 40,
-            MarketVolume_nextWeek: 15
+            d1: 10,
+            d2: 20,
+            d3: 30,
+            d4: 40,
+            d5: 15
           },
           {
             breedName: '桂味',
@@ -174,14 +177,44 @@ export default {
           {
             breedName: '黑叶',
             onMarket: 1,
-            MarketVolume_thisWeek: 10,
-            highestPrice_thisWeek: 20,
-            lowestPrice_thisWeek: 30,
-            price_nextWeek: 40,
-            MarketVolume_nextWeek: 15
+            d1: 10,
+            d2: 20,
+            d3: 30,
+            d4: 40,
+            d5: 15
           }
         ]
-      }
+      },
+      issue: {}
+    }
+  },
+  computed: {
+    id() {
+      return this.$route.query.id
+    }
+  },
+  mounted() {
+    this.getFormData(this.id)
+  },
+  methods: {
+    getFormData(id) {
+      getBaseDataByIssueId({ id }).then(res => {
+        this.issue = res.issue
+        console.log(res)
+      })
+    },
+    save() {
+      this.postData(0)
+    },
+    submit() {
+      this.postData(1)
+    },
+    postData(state) {
+      const { id } = this
+      const data = JSON.stringify(this.tableData.data)
+      addOrUpdateBaseData({ id, data, state }).then(res => {
+        console.log(res)
+      })
     }
   }
 }

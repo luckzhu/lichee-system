@@ -30,3 +30,11 @@ export function queryBase(params) {
   })
 }
 
+// 获取该地区的基地列表，不传就是获取自己地区的
+export function queryBaseByRegionCode(params) {
+  return request({
+    url: '/base/queryBaseByRegionCode',
+    method: 'GET',
+    params
+  })
+}

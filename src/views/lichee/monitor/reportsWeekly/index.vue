@@ -15,6 +15,8 @@
 <script>
 import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
+import { queryIssueByUnitId, queryIssueByBaseId } from '@/api/task'
+import { parseTime } from '@/utils/index'
 
 export default {
   name: 'ReportsWeekly',
@@ -30,22 +32,24 @@ export default {
             label: '期号'
           },
           {
-            prop: 'baseName',
+            prop: 'name',
             label: '基地名称',
             minWidth: '100px'
           },
           {
-            prop: 'period',
-            label: '填报周期'
+            prop: 'dataBegin',
+            label: '开始日期',
+            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
           },
           {
-            prop: 'deadline',
-            label: '截止日期'
+            prop: 'dataEnd',
+            label: '结束日期',
+            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
           },
           {
-            prop: 'breeds',
-            label: '已登记品种',
-            minWidth: '140px'
+            prop: 'endTime',
+            label: '截止日期',
+            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
           },
           {
             prop: 'state',
@@ -79,46 +83,17 @@ export default {
             }
           }
         ],
-        data: [
-          {
-            id: 1,
-            issue: '20200506',
-            period: '0430 ~ 0506',
-            deadline: '0508',
-            baseName: '不知道种点啥的荔枝基地',
-            breeds: '妃子笑，白糖罂，桂味，黑叶，糯米糍，怀枝',
-            state: -1
-          },
-          {
-            id: 2,
-            issue: '20200506',
-            period: '0430 ~ 0506',
-            deadline: '0508',
-            baseName: '不知道种点啥的荔枝基地22',
-            breeds: '妃子笑，白糖罂',
-            state: 1
-          },
-          {
-            id: 3,
-            issue: '20200513',
-            period: '0507 ~ 0513',
-            deadline: '0515',
-            baseName: '不知道种点啥的荔枝基地',
-            breeds: '妃子笑，白糖罂，桂味，黑叶，糯米糍，怀枝',
-            state: 2
-          },
-          {
-            id: 4,
-            issue: '20200513',
-            period: '0507 ~ 0513',
-            deadline: '0515',
-            baseName: '不知道种点啥的荔枝基地22',
-            breeds: '妃子笑，白糖罂',
-            state: 3
-          }
-        ]
+        data: []
       }
     }
+  },
+  computed: {
+    roles() {
+      return this.$store.getters.roles
+    }
+  },
+  mounted() {
+    this.getIssue(this.roles)
   },
   methods: {
     handleEdit(index, row) {
@@ -129,6 +104,17 @@ export default {
         query: { id }
       })
       console.log(index, row)
+    },
+    getIssue(roles) {
+      if (roles.includes('nongye')) {
+        queryIssueByUnitId().then(res => {
+          this.tableData.data = res.rows
+        })
+      } else if (roles.includes('jidi')) {
+        queryIssueByBaseId().then(res => {
+          this.tableData.data = res.rows
+        })
+      }
     }
   }
 }
