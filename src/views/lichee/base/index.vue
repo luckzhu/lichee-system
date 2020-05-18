@@ -1,10 +1,10 @@
 <template>
   <div>
-    <el-button type="primary" class="add" @click="addBase">新增生产基地</el-button>
+    <el-button v-if="roles.includes('nongye')" type="primary" class="add" @click="addBase">新增生产基地</el-button>
     <lb-table :column="tableData.column" :data="tableData.data" border stripe align="center" />
 
     <!-- 新增基地表单 -->
-    <!-- <div class="addDailog">
+    <div class="addDailog">
       <el-dialog
         title="新增生产基地"
         :close-on-click-modal="false"
@@ -13,58 +13,59 @@
         top="10vh"
         center
       >
-        <add-base-form ref="addBaseForm" />
+        <add-base-form ref="addBaseForm" :key="baseKey" :form-data="formData" />
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submit">确 定</el-button>
+          <el-button type="primary" @click="submit">{{ submitText }}</el-button>
         </div>
       </el-dialog>
-    </div>-->
+    </div>
 
-    <AddBaseFormDialog ref="addBaseForm" />
+    <!-- <AddBaseFormDialog ref="addBaseForm" /> -->
   </div>
 </template>
 
 <script>
 import LbTable from '@/components/LbTable'
 // import AddBaseForm from './components/AddBaseForm'
-import AddBaseFormDialog from './components/AddBaseFormDialog'
-import { queryBase } from '@/api/base'
-import { stateMap } from '@/utils/submit'
+import AddBaseForm from './components/AddBaseForm'
+import { queryBase, queryBaseByRegionCode } from '@/api/base'
 
 export default {
   name: 'Base',
   components: {
     LbTable,
-    // AddBaseForm,
-    AddBaseFormDialog
+    AddBaseForm
   },
   data() {
     return {
+      dialogFormVisible: false,
+      formData: {},
       tableData: {
         column: [
           {
-            prop: 'enterpriseName',
+            prop: 'name',
             label: '企业字号'
           },
           {
-            prop: 'cityAndCounty',
-            label: '地级市/县（区）'
+            prop: 'cityName',
+            label: '地级市/县（区）',
+            formatter: row => row.cityName + row.countyName
           },
           {
             prop: 'address',
             label: '基地详细地址'
           },
           {
-            prop: 'contact',
+            prop: 'contactName',
             label: '联系人'
           },
           {
-            prop: 'phone',
+            prop: 'contactPhone',
             label: '手机号'
           },
           {
-            prop: 'area',
+            prop: 'scale',
             label: '基地面积（亩）'
           },
           {
@@ -72,30 +73,30 @@ export default {
             label: '预计产量（公斤）'
           },
           {
-            prop: 'coldStorageVolume',
+            prop: 'coldScale',
             label: '冷库容积（m³）'
           },
           {
-            prop: 'coldChainCar',
+            prop: 'coldCar',
             label: '冷链车（台）'
           },
           {
-            prop: 'classifyingEquipments',
+            prop: 'levelDevice',
             label: '分级设备',
             formatter: row => (row.classifyingEquipments ? '有' : '无')
           },
           {
-            prop: 'balingEquipment',
+            prop: 'packDevice',
             label: '打包设备',
             formatter: row => (row.balingEquipment ? '有' : '无')
           },
           {
-            prop: 'expressSite',
+            prop: 'arrestPoint',
             label: '快递驻点',
             formatter: row => (row.expressSite ? '有' : '无')
           },
           {
-            prop: 'exportFiling',
+            prop: 'exportFile',
             label: '出口备案',
             formatter: row => (row.exportFiling ? '有' : '无')
           },
@@ -105,61 +106,95 @@ export default {
             render: (h, scope) => {
               return (
                 <div>
-                  <el-tag type={stateMap[scope.row.state].type}>
-                    {stateMap[scope.row.state].label}
+                  <el-tag type={scope.row.state === 0 ? '' : 'success'}>
+                    {scope.row.state === 0 ? '未审核' : '已审核'}
                   </el-tag>
+                </div>
+              )
+            }
+          },
+          {
+            label: '操作',
+            render: (h, scope) => {
+              return (
+                <div>
+                  <el-button
+                    type='primary'
+                    onClick={() => {
+                      this.toBaseForm(scope.row)
+                    }}
+                  >
+                    {this.roles.includes('shiji') ? '审核' : '查看'}
+                  </el-button>
                 </div>
               )
             }
           }
         ],
-        data: [
-          {
-            enterpriseName: '老字号',
-            cityAndCounty: '广东省天河区',
-            address: '农科院创新大楼231',
-            contact: '大傻子',
-            phone: '12345678900',
-            area: 20,
-            yield: 30,
-            coldStorageVolume: 40,
-            coldChainCar: 15,
-            classifyingEquipments: 1,
-            balingEquipment: 0,
-            expressSite: 1,
-            exportFiling: 1,
-            state: 1
-          },
-          {
-            enterpriseName: '老字号',
-            cityAndCounty: '广东省天河区',
-            address: '农科院创新大楼230',
-            contact: '二傻子',
-            phone: '12345678900',
-            area: 20,
-            yield: 30,
-            coldStorageVolume: 40,
-            coldChainCar: 15,
-            classifyingEquipments: 1,
-            balingEquipment: 0,
-            expressSite: 1,
-            exportFiling: 1,
-            state: 1
-          }
-        ]
+        data: []
+      },
+      baseKey: -1
+    }
+  },
+  computed: {
+    roles() {
+      return this.$store.getters.roles
+    },
+    submitText() {
+      if (this.roles.includes('shiji')) {
+        return '审核通过'
+      } else {
+        return '提交'
       }
     }
   },
   mounted() {
-    queryBase().then(res => {
-      console.log(res)
-    })
+    this.getBaseList(this.roles)
   },
   methods: {
     addBase() {
-      console.log(111)
-      this.$refs.addBaseForm.$emit('open')
-      console.log(22)
+      this.formData = {}
+      this.baseKey = -1
+      this.dialogFormVisible = true
+    },
+    submit() {
+      console.log('提交')
+    },
+    toBaseForm(row) {
+      console.log(row)
+      this.dialogFormVisible = true
+      this.baseKey = row.id
+      row.regionCode = [row.regionCode.substring(0, 4), row.regionCode]
+
+      // const bIds = ['101', '102', '103', '104', '105', '106']
+
+      // bIds.forEach(item => {
+      //   row[`breed_${item}`] = {
+      //     isHave: 1
+      //   }
+      // })
+      // row.detail.forEach(item => {
+      //   bIdsTemp.push(item.bId);
+      //   row[`breed_${item.bId}`] = {
+      //     isHave: 1,
+      //     yield: item.yield,
+      //     scale: item.scale
+      //   };
+      // });
+
+      console.log(row)
+      this.formData = row
+    },
+    getBaseList(roles) {
+      if (roles.includes('shiji')) {
+        queryBaseByRegionCode().then(res => {
+          this.tableData.data = res.rows
+        })
+      } else {
+        queryBase().then(res => {
+          this.tableData.data = res.rows
+        })
+      }
     }
   }
 }
