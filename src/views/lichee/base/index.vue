@@ -14,10 +14,10 @@
         center
       >
         <add-base-form ref="addBaseForm" :key="baseKey" :form-data="formData" />
-        <div slot="footer" class="dialog-footer">
+        <!-- <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="submit">{{ submitText }}</el-button>
-        </div>
+        </div> -->
       </el-dialog>
     </div>
 
@@ -158,32 +158,25 @@ export default {
       this.dialogFormVisible = true
     },
     submit() {
-      console.log('提交')
+      this.$refs.addBaseForm.handleSubmit()
     },
     toBaseForm(row) {
       console.log(row)
+      const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
       this.baseKey = row.id
-      row.regionCode = [row.regionCode.substring(0, 4), row.regionCode]
+      temp.regionCode = [temp.regionCode.substring(0, 4), temp.regionCode]
 
-      // const bIds = ['101', '102', '103', '104', '105', '106']
-
-      // bIds.forEach(item => {
-      //   row[`breed_${item}`] = {
-      //     isHave: 1
-      //   }
-      // })
-      // row.detail.forEach(item => {
-      //   bIdsTemp.push(item.bId);
-      //   row[`breed_${item.bId}`] = {
-      //     isHave: 1,
-      //     yield: item.yield,
-      //     scale: item.scale
-      //   };
-      // });
-
-      console.log(row)
-      this.formData = row
+      const bIds = ['101', '102', '103', '104', '105', '106']
+      bIds.forEach(item => {
+        temp[`breed_${item}`] = 0
+      })
+      temp.detail.forEach(item => {
+        temp[`breed_${item.bId}`] = 1
+        temp[`scale_${item.bId}`] = item.scale
+        temp[`yield_${item.bId}`] = item.yield
+      })
+      this.formData = JSON.parse(JSON.stringify(temp))
     },
     getBaseList(roles) {
       if (roles.includes('shiji')) {

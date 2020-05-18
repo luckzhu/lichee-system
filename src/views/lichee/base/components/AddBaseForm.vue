@@ -7,6 +7,7 @@
       :rules="rules"
       label-position="left"
       :is-responsive="false"
+      :is-show-cancel-btn="false"
       :is-dialog="true"
       @request-success="handleSuccess"
       @request-error="handleError"
@@ -81,13 +82,13 @@ export default {
           layout: 12,
           required: true // 必填简写
         },
-        contact: {
+        contactName: {
           type: 'input',
           label: '联系人',
           required: true,
           layout: 12
         },
-        phone: {
+        contactPhone: {
           type: 'input',
           label: '手机号',
           required: true,
@@ -172,202 +173,189 @@ export default {
         },
 
         breed_101: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '妃子笑',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_101.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_101.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '妃子笑',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
         },
+        scale_101: {
+          vif: data => data.breed_101,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_101: {
+          vif: data => data.breed_101,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+
         breed_102: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '白糖罂',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_102.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_102.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '白糖罂',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
         },
+        scale_102: {
+          vif: data => data.breed_102,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_102: {
+          vif: data => data.breed_102,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+
         breed_103: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '桂味',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_103.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_103.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '桂味',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
         },
+        scale_103: {
+          vif: data => data.breed_103,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_103: {
+          vif: data => data.breed_103,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+
         breed_104: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '黑叶',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_104.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_104.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '黑叶',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
         },
+        scale_104: {
+          vif: data => data.breed_104,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_104: {
+          vif: data => data.breed_104,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+
         breed_105: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '糯米糍',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_105.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_105.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '糯米糍',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
         },
+        scale_105: {
+          vif: data => data.breed_105,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_105: {
+          vif: data => data.breed_105,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+
         breed_106: {
-          children: {
-            isHave: {
-              type: 'radio',
-              label: '怀枝',
-              required: true,
-              options: [
-                { text: '有生产', value: 1 },
-                { text: '未生产', value: 0 }
-              ]
-            },
-            scale: {
-              vif: data => data.breed_106.isHave,
-              type: 'number',
-              label: '采收面积',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            },
-            yield: {
-              vif: data => data.breed_106.isHave,
-              type: 'number',
-              label: '预计产量',
-              attrs: {
-                controls: false
-              },
-              required: true,
-              layout: 12
-            }
-          }
+          type: 'radio',
+          label: '怀枝',
+          required: true,
+          layout: 24,
+          options: [
+            { text: '有生产', value: 1 },
+            { text: '未生产', value: 0 }
+          ]
+        },
+        scale_106: {
+          vif: data => data.breed_106,
+          type: 'number',
+          label: '采收面积',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
+        },
+        yield_106: {
+          vif: data => data.breed_106,
+          type: 'number',
+          label: '预计产量',
+          attrs: {
+            controls: false
+          },
+          required: true,
+          layout: 8
         }
       },
       myFormData: this.formData,
@@ -395,20 +383,21 @@ export default {
       const { regionCode } = obj
       obj.regionCode = regionCode[regionCode.length - 1]
       const data = []
+      const bIds = ['101', '102', '103', '104', '105', '106']
 
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          const [name, code] = key.split('_')
-          if (name === 'breed') {
-            if (obj[key].isHave) {
-              obj[key].bid = code
-              delete obj[key].isHave
-              data.push(obj[key])
-            }
-            delete obj[key]
-          }
+      bIds.forEach(item => {
+        if (obj[`breed_${item}`] === 1) {
+          data.push({
+            bId: item,
+            scale: obj[`scale_${item}`],
+            yield: obj[`yield_${item}`]
+          })
         }
-      }
+        delete obj[`breed_${item}`]
+        delete obj[`scale_${item}`]
+        delete obj[`yield_${item}`]
+      })
+
       obj.bId = 100 // 代表荔枝
       obj.data = JSON.stringify(data)
 
