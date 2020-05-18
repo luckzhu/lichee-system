@@ -28,7 +28,7 @@
 
 <script>
 import { queryRegion } from '@/api/normal'
-import { register } from '@/api/user'
+import { register, checkAccount, checkOrgCode } from '@/api/user'
 
 export default {
   name: 'Register',
@@ -52,12 +52,40 @@ export default {
     }
     const orgCode = (rule, value, callback) => {
       const orgCodeReg = /^[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}$/
-      if (value !== '' && !orgCodeReg.test(value)) {
+      if (value === '') {
+        callback(new Error('请输入统一社会信用代码'))
+      } else if (value !== '' && !orgCodeReg.test(value)) {
         callback(new Error('请输入正确的统一社会信用代码'))
       } else {
-        callback()
+        checkOrgCode({ orgCode: value }).then(res => {
+          if (res.code === 201) {
+            callback(new Error('该统一社会信用代码的企业已存在'))
+          } else if (res.code === 200) {
+            const data = res.data.info
+            data.regionCode = [data.regionCode.substring(0, 4), data.regionCode]
+            data.unitName = data.name
+            data.roleId = 1
+            this.formData = data
+            console.log(this.formData)
+            callback()
+          }
+        })
       }
     }
+    const account = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请填写用户名'))
+      } else {
+        checkAccount({ account: value }).then(res => {
+          if (res.code === 201) {
+            callback(new Error('用户名已存在'))
+          } else {
+            callback()
+          }
+        })
+      }
+    }
+
     return {
       // 表单数据
       formData: {},
@@ -185,6 +213,7 @@ export default {
         rePassword: [{ validator: validateRePassword, trigger: 'blur' }],
         phone: [{ validator: phone, trigger: 'blur' }],
         orgCode: [{ validator: orgCode, trigger: 'blur' }],
+        account: [{ validator: account, trigger: 'blur' }],
         email: [
           {
             type: 'email',

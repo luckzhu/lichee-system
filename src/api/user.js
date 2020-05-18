@@ -33,3 +33,21 @@ export function register(data) {
     data
   })
 }
+
+// 检查账号是否已存在 account 账号
+export function checkAccount(params) {
+  return request({
+    url: '/auth/checkAccount',
+    method: 'get',
+    params
+  })
+}
+
+// 检查信用代码有没有存在，再检查有没有在已入库那里 orgCode
+export function checkOrgCode(params) {
+  return request({
+    url: '/auth/checkOrgCode',
+    method: 'get',
+    params
+  })
+}
