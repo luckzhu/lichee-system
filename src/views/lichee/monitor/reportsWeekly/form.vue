@@ -24,7 +24,7 @@
     </div>
 
     <footer>
-      <el-button type="primary" @click="save">保存但不提交</el-button>
+      <el-button type="primary" :loading="btnLoading" @click="save">保存但不提交</el-button>
       <el-button type="success" @click="submit">数据无误并提交</el-button>
     </footer>
   </div>
@@ -187,7 +187,8 @@ export default {
       },
       issue: {},
       baseinfo: {},
-      breed: []
+      breed: [],
+      btnLoading: false
     }
   },
   computed: {
@@ -226,21 +227,42 @@ export default {
       this.postData(1)
     },
     validate(data) {
-      // console.log(this.tableData.data)
-      // let message = []
-      // this.tableData.data.forEach(item => {
-      //   if (item.i1 === 1) {
-      //     if (item.d1 !== 0 && !item.d1) {
-      //       return false
-      //       message.push(`请填写一下必填项${d1}`)
-      //     }
-      //   }
-      // })
-      return false
+      console.log(this.tableData.data)
+      const message = []
+      const requiredArr = [
+        { field: 'd1', label: '基地本周上市量' },
+        { field: 'd2', label: '基地田头大宗最高价' },
+        { field: 'd3', label: '基地田头大宗最低价' },
+        { field: 'd4', label: '预计下周价格' },
+        { field: 'd5', label: '预计下周基地上市量' },
+        { field: 'i2', label: '行情预判' }
+      ]
+
+      let valid = true
+      this.tableData.data.forEach(item => {
+        if (item.i1 === 1) {
+          requiredArr.map(ele => {
+            if (item[ele.field] !== 0 && !item[ele.field]) {
+              message.push(
+                `请填写必填项: ${licheeBreedMap.get(item.bId)}-${ele.label}`
+              )
+              valid = false
+            }
+          })
+        }
+      })
+      if (message.length > 0) {
+        this.$alert(message.join('<br>'), '必填', {
+          confirmButtonText: '确定',
+          dangerouslyUseHTMLString: true,
+          callback: () => {}
+        })
+      }
+      return valid
     },
     postData(state) {
-      console.log(this.tableData.data)
       if (!this.validate()) return
+      this.btnLoading = true
       const { id } = this
       const tempData = JSON.parse(JSON.stringify(this.tableData.data))
       const fieldName = ['id', 'scale', 'yield', 'baseId']
@@ -248,13 +270,37 @@ export default {
         for (const key in item) {
           if (fieldName.includes(key)) delete item[key]
         }
+        console.log(item)
+        if (item.i1 === 0) {
+          item.d1 = 0
+          item.d2 = 0
+          item.d3 = 0
+          item.d4 = 0
+          item.d5 = 0
+          item.i2 = 0
+        }
         item.name = licheeBreedMap.get(item.bId)
         item.biId = id
       })
       const data = JSON.stringify(tempData)
-      addOrUpdateBaseData({ id, data, state }).then(res => {
-        console.log(res)
-      })
+      addOrUpdateBaseData({ id, data, state })
+        .then(res => {
+          this.btnLoading = false
+          if (res.code === 200) {
+            this.$message({
+              message: res.data.info,
+              type: 'success'
+            })
+          } else {
+            this.$message({
+              message: `保存失败 ${res.data.info}`,
+              type: 'danger'
+            })
+          }
+        })
+        .catch(() => {
+          this.btnLoading = false
+        })
     }
   }
 }
@@ -276,7 +322,7 @@ footer {
   text-align: right;
 }
 
-.table-mobile{
+.table-mobile {
   margin-bottom: 60px;
 }
 </style>
@@ -288,5 +334,11 @@ footer {
 
 .el-input-number--small {
   width: 100%;
+}
+
+@media screen and (max-width: 778px) {
+  .el-message-box {
+    width: 80%;
+  }
 }
 </style>
