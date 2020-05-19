@@ -10,7 +10,18 @@
         <span>{{ baseinfo.name }}</span>
       </p>
     </div>
-    <lb-table :column="tableData.column" :data="tableData.data" border stripe align="center" />
+    <div>
+      <lb-table
+        v-if="device === 'desktop'"
+        :column="tableData.column"
+        :data="tableData.data"
+        border
+        stripe
+        align="center"
+      />
+
+      <table-mobile v-else class="table-mobile" :table-data="tableData" />
+    </div>
 
     <footer>
       <el-button type="primary" @click="save">保存但不提交</el-button>
@@ -23,11 +34,14 @@
 import LbTable from '@/components/LbTable'
 import { addOrUpdateBaseData, getBaseDataByIssueId } from '@/api/task'
 import { licheeBreedMap } from '@/utils/submit'
+import { mapGetters } from 'vuex'
+import TableMobile from './table-mobile'
 
 export default {
   name: 'Form',
   components: {
-    LbTable
+    LbTable,
+    TableMobile
   },
   data() {
     return {
@@ -42,6 +56,7 @@ export default {
           {
             prop: 'i1',
             label: '是否上市',
+            width: '140px',
             render: (h, scope) => {
               return (
                 <div>
@@ -147,6 +162,25 @@ export default {
                 }
               }
             ]
+          },
+          {
+            prop: 'i2',
+            label: '行情预判',
+            width: '240px',
+            render: (h, scope) => {
+              return (
+                <div>
+                  <el-radio-group
+                    v-model={scope.row.i2}
+                    disabled={!scope.row.i1}
+                  >
+                    <el-radio label={1}>上涨 </el-radio>
+                    <el-radio label={2}>持平</el-radio>
+                    <el-radio label={3}>下跌</el-radio>
+                  </el-radio-group>
+                </div>
+              )
+            }
           }
         ],
         data: []
@@ -157,12 +191,20 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['device']),
     id() {
       return this.$route.query.id
+    },
+    $_isMobile() {
+      const { body } = document
+      const WIDTH = 992
+      const rect = body.getBoundingClientRect()
+      return rect.width - 1 < WIDTH
     }
   },
   mounted() {
     this.getFormData(this.id)
+    console.log(this.device)
   },
   methods: {
     getFormData(id) {
@@ -173,13 +215,7 @@ export default {
         this.tableData.data = res.breed
         const { data } = res
         if (data.length > 0) {
-          this.tableData.data.forEach(item => {
-            data.forEach(ele => {
-              if (item.bId === ele.bId) {
-                Object.assign(item, ele)
-              }
-            })
-          })
+          this.tableData.data = data
         }
       })
     },
@@ -189,7 +225,22 @@ export default {
     submit() {
       this.postData(1)
     },
+    validate(data) {
+      // console.log(this.tableData.data)
+      // let message = []
+      // this.tableData.data.forEach(item => {
+      //   if (item.i1 === 1) {
+      //     if (item.d1 !== 0 && !item.d1) {
+      //       return false
+      //       message.push(`请填写一下必填项${d1}`)
+      //     }
+      //   }
+      // })
+      return false
+    },
     postData(state) {
+      console.log(this.tableData.data)
+      if (!this.validate()) return
       const { id } = this
       const tempData = JSON.parse(JSON.stringify(this.tableData.data))
       const fieldName = ['id', 'scale', 'yield', 'baseId']
@@ -223,5 +274,19 @@ footer {
   z-index: 100;
   overflow: hidden;
   text-align: right;
+}
+
+.table-mobile{
+  margin-bottom: 60px;
+}
+</style>
+
+<style lang="scss" >
+.required-error .el-input__inner {
+  border-color: red;
+}
+
+.el-input-number--small {
+  width: 100%;
 }
 </style>
