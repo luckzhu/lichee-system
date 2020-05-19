@@ -201,6 +201,12 @@ $light_gray: #eee;
     overflow: hidden;
   }
 
+  @media screen and (max-width: 778px) {
+    .login-form {
+      width: 80%;
+    }
+  }
+
   .tips {
     font-size: 14px;
     color: #292926;
@@ -225,12 +231,20 @@ $light_gray: #eee;
     position: relative;
     .title {
       font-size: 60px;
-
       letter-spacing: 4px;
       color: #b33038;
       text-align: center;
       font-weight: bold;
       white-space: nowrap;
+    }
+  }
+
+  @media screen and (max-width: 778px) {
+    .title-container {
+      .title {
+        font-size: 40px;
+        white-space: pre-wrap;
+      }
     }
   }
 
