@@ -28,7 +28,7 @@
 
 <script>
 import { queryRegion } from '@/api/normal'
-import { register, checkAccount, checkOrgCode } from '@/api/user'
+import { register, checkOrgCode } from '@/api/user'
 
 export default {
   name: 'Register',
@@ -36,13 +36,13 @@ export default {
     const validateRePassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'))
-      } else if (value !== this.formData.password) {
+      } else if (value !== this.formData.pwd) {
         callback(new Error('两次输入密码不一致!'))
       } else {
         callback()
       }
     }
-    const phone = (rule, value, callback) => {
+    const contactPhone = (rule, value, callback) => {
       const mobileReg = /^(?:(?:\+|00)86)?1[3-9]\d{9}$/
       if (value !== '' && !mobileReg.test(value)) {
         callback(new Error('请输入正确的手机号码'))
@@ -61,30 +61,32 @@ export default {
           if (res.code === 201) {
             callback(new Error('该统一社会信用代码的企业已存在'))
           } else if (res.code === 200) {
-            const data = res.data.info
-            data.regionCode = [data.regionCode.substring(0, 4), data.regionCode]
-            data.unitName = data.name
-            data.roleId = 1
-            this.formData = data
-            console.log(this.formData)
+            // const data = res.data.info
+            // data.regionCode = [data.regionCode.substring(0, 4), data.regionCode]
+            // data.unitName = data.name
+            // data.roleId = 1
+            // this.formData = data
+            // console.log(this.formData)
             callback()
-          }
-        })
-      }
-    }
-    const account = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请填写用户名'))
-      } else {
-        checkAccount({ account: value }).then(res => {
-          if (res.code === 201) {
-            callback(new Error('用户名已存在'))
           } else {
             callback()
           }
         })
       }
     }
+    // const account = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请填写用户名'))
+    //   } else {
+    //     checkAccount({ account: value }).then(res => {
+    //       if (res.code === 201) {
+    //         callback(new Error('用户名已存在'))
+    //       } else {
+    //         callback()
+    //       }
+    //     })
+    //   }
+    // }
 
     return {
       // 表单数据
@@ -131,12 +133,12 @@ export default {
           label: '统一社会信用代码',
           required: true // 必填简写
         },
-        account: {
-          type: 'input',
-          label: '用户名',
-          required: true
-        },
-        password: {
+        // account: {
+        //   type: 'input',
+        //   label: '用户名',
+        //   required: true
+        // },
+        pwd: {
           type: 'password',
           label: '密码',
           required: true
@@ -147,7 +149,7 @@ export default {
           required: true
         },
         roleId: {
-          type: 'select',
+          type: 'radio',
           label: '单位类型',
           required: true,
           options: [
@@ -155,12 +157,12 @@ export default {
             { text: '物流企业', value: 2 }
           ]
         },
-        realName: {
+        contactName: {
           type: 'input',
           label: '姓名',
           required: true
         },
-        phone: {
+        contactPhone: {
           type: 'input',
           label: '联系手机',
           required: true
@@ -202,7 +204,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        password: [
+        pwd: [
           {
             min: 6,
             max: 18,
@@ -211,16 +213,8 @@ export default {
           }
         ],
         rePassword: [{ validator: validateRePassword, trigger: 'blur' }],
-        phone: [{ validator: phone, trigger: 'blur' }],
-        orgCode: [{ validator: orgCode, trigger: 'blur' }],
-        account: [{ validator: account, trigger: 'blur' }],
-        email: [
-          {
-            type: 'email',
-            message: '请输入正确的邮箱地址',
-            trigger: ['blur']
-          }
-        ]
+        contactPhone: [{ validator: contactPhone, trigger: 'blur' }],
+        orgCode: [{ validator: orgCode, trigger: 'blur' }]
       }
     }
   },

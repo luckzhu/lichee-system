@@ -11,7 +11,6 @@
       auto-complete="on"
       label-position="left"
     >
-
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
@@ -106,8 +105,13 @@ export default {
           this.loading = true
           this.$store
             .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/' })
+            .then(res => {
+              // 202跳转到旧系统
+              if (res.code === 202) {
+                window.location.href = `http://gdmpxt.org/${res.data.info.forwardUrl}`
+              } else {
+                this.$router.push({ path: this.redirect || '/' })
+              }
               this.loading = false
             })
             .catch(() => {

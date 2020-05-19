@@ -14,7 +14,7 @@
       <!-- <img :src="avatar" class="avatar"> -->
       <!-- </div> -->
 
-      <div class="welcome">欢迎您，{{ name }}</div>
+      <div v-if="device === 'desktop'" class="welcome">欢迎您，{{ name }}</div>
       <el-tooltip class="item" effect="dark" content="退出登录" placement="bottom">
         <div class="logout" @click="logout">
           <svg-icon icon-class="logout" />
@@ -40,7 +40,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['sidebar', 'name'])
+    ...mapGetters(['sidebar', 'name', 'device'])
   },
   methods: {
     toggleSideBar() {
@@ -96,7 +96,7 @@ export default {
     }
     .logout {
       cursor: pointer;
-      color: #B33038;
+      color: #b33038;
       .svg-icon {
         width: 20px;
         height: 20px;
