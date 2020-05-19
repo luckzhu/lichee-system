@@ -9,6 +9,7 @@
       :is-responsive="false"
       :is-show-cancel-btn="false"
       :is-dialog="true"
+      :disabled="disabled"
       @request-success="handleSuccess"
       @request-error="handleError"
     />
@@ -25,6 +26,10 @@ export default {
     // eslint-disable-next-line
     formData: {
       type: Object
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   data() {

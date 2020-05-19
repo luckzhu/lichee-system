@@ -13,11 +13,11 @@
         top="10vh"
         center
       >
-        <add-base-form ref="addBaseForm" :key="baseKey" :form-data="formData" />
+        <add-base-form ref="addBaseForm" :key="baseKey" :form-data="formData" :disabled="disabled" />
         <!-- <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="submit">{{ submitText }}</el-button>
-        </div> -->
+        </div>-->
       </el-dialog>
     </div>
 
@@ -133,7 +133,8 @@ export default {
         ],
         data: []
       },
-      baseKey: -1
+      baseKey: -1,
+      disabled: false
     }
   },
   computed: {
@@ -153,6 +154,7 @@ export default {
   },
   methods: {
     addBase() {
+      this.disabled = false
       this.formData = {}
       this.baseKey = -1
       this.dialogFormVisible = true
@@ -162,6 +164,7 @@ export default {
     },
     toBaseForm(row) {
       console.log(row)
+      this.disabled = true
       const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
       this.baseKey = row.id
