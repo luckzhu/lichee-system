@@ -25,7 +25,7 @@ export function addBase(data) {
 export function queryBase(params) {
   return request({
     url: '/base/queryBaseByUnitId',
-    method: 'GET',
+    method: 'get',
     params
   })
 }
@@ -34,7 +34,16 @@ export function queryBase(params) {
 export function queryBaseByRegionCode(params) {
   return request({
     url: '/base/queryBaseByRegionCode',
-    method: 'GET',
+    method: 'get',
     params
+  })
+}
+
+// 审核基地 id state
+export function validBase(data) {
+  return request({
+    url: '/base/validBase',
+    method: 'post',
+    data
   })
 }

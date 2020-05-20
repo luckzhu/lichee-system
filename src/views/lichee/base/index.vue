@@ -9,15 +9,15 @@
         title="新增生产基地"
         :close-on-click-modal="false"
         :visible.sync="dialogFormVisible"
-        width="50%"
+        :width="dialogWidth"
         top="10vh"
         center
       >
-        <add-base-form ref="addBaseForm" :key="baseKey" :form-data="formData" :disabled="disabled" />
-        <!-- <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submit">{{ submitText }}</el-button>
-        </div>-->
+        <add-base-form ref="addBaseForm" :key="baseId" :form-data="formData" :disabled="disabled" />
+        <div v-if="roles.includes('shiji')" slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="approve">审核通过</el-button>
+          <el-button type="danger" @click="sendBack">退回</el-button>
+        </div>
       </el-dialog>
     </div>
 
@@ -27,9 +27,10 @@
 
 <script>
 import LbTable from '@/components/LbTable'
-// import AddBaseForm from './components/AddBaseForm'
+import { stateMap } from '@/utils/submit'
 import AddBaseForm from './components/AddBaseForm'
-import { queryBase, queryBaseByRegionCode } from '@/api/base'
+import { queryBase, queryBaseByRegionCode, validBase } from '@/api/base'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Base',
@@ -106,8 +107,10 @@ export default {
             render: (h, scope) => {
               return (
                 <div>
-                  <el-tag type={scope.row.state === 0 ? '' : 'success'}>
-                    {scope.row.state === 0 ? '未审核' : '已审核'}
+                  <el-tag
+                    type={scope.row.state ? stateMap[scope.row.state].type : ''}
+                  >
+                    {scope.row.state ? stateMap[scope.row.state].label : ''}
                   </el-tag>
                 </div>
               )
@@ -133,19 +136,25 @@ export default {
         ],
         data: []
       },
-      baseKey: -1,
+      baseId: -1,
       disabled: false
     }
   },
   computed: {
-    roles() {
-      return this.$store.getters.roles
-    },
+    ...mapGetters(['device', 'roles']),
     submitText() {
       if (this.roles.includes('shiji')) {
         return '审核通过'
       } else {
         return '提交'
+      }
+    },
+    dialogWidth() {
+      console.log(this.device)
+      if (this.device === 'desktop') {
+        return '1200px'
+      } else {
+        return '95%'
       }
     }
   },
@@ -156,18 +165,34 @@ export default {
     addBase() {
       this.disabled = false
       this.formData = {}
-      this.baseKey = -1
+      this.baseId = -1
       this.dialogFormVisible = true
     },
-    submit() {
-      this.$refs.addBaseForm.handleSubmit()
+    approve() {
+      validBase({ id: this.baseId, state: 2 }).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '审核通过',
+            type: 'success'
+          })
+        }
+      })
+    },
+    sendBack() {
+      validBase({ id: this.baseId, state: 3 }).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '退回成功',
+            type: 'success'
+          })
+        }
+      })
     },
     toBaseForm(row) {
-      console.log(row)
       this.disabled = true
       const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
-      this.baseKey = row.id
+      this.baseId = row.id
       temp.regionCode = [temp.regionCode.substring(0, 4), temp.regionCode]
 
       const bIds = ['101', '102', '103', '104', '105', '106']

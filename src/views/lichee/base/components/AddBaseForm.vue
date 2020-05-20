@@ -3,13 +3,15 @@
     <ele-form
       v-model="myFormData"
       :form-desc="formDesc"
-      :request-fn="handleSubmit"
       :rules="rules"
       label-position="left"
       :is-responsive="false"
       :is-show-cancel-btn="false"
+      :is-show-submit-btn="isShowSubmit"
       :is-dialog="true"
       :disabled="disabled"
+      :is-loading="isLoading"
+      :request-fn="handleSubmit"
       @request-success="handleSuccess"
       @request-error="handleError"
     />
@@ -19,6 +21,7 @@
 <script>
 import { queryRegion } from '@/api/normal'
 import { addBase } from '@/api/base'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'FormDialog',
@@ -41,7 +44,27 @@ export default {
         callback()
       }
     }
+    const isZero = (rule, value, callback) => {
+      if (rule.field.charAt(5) === '_') {
+        console.log(rule.field)
+        const breedCode = rule.field.split('_')[1]
+        const isOn = this.myFormData[`breed_${breedCode}`]
+        if (isOn === 1 && value === 0) {
+          callback(new Error('该指标不能为0'))
+        } else {
+          callback()
+        }
+      } else {
+        if (value === 0) {
+          callback(new Error('该指标不能为0'))
+        } else {
+          callback()
+        }
+      }
+    }
     return {
+      isLoading: false,
+      formError: {},
       // 表单数据
       formDesc: {
         name: {
@@ -170,6 +193,7 @@ export default {
         exportFile: {
           type: 'radio',
           label: '出口备案',
+          required: true,
           layout: 12,
           options: [
             { text: '有', value: 1 },
@@ -181,14 +205,14 @@ export default {
           type: 'radio',
           label: '妃子笑',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_101: {
-          vif: data => data.breed_101,
+          disabled: data => !data.breed_101,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -198,7 +222,7 @@ export default {
           layout: 8
         },
         yield_101: {
-          vif: data => data.breed_101,
+          disabled: data => !data.breed_101,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -212,14 +236,14 @@ export default {
           type: 'radio',
           label: '白糖罂',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_102: {
-          vif: data => data.breed_102,
+          disabled: data => !data.breed_102,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -229,7 +253,7 @@ export default {
           layout: 8
         },
         yield_102: {
-          vif: data => data.breed_102,
+          disabled: data => !data.breed_102,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -243,14 +267,14 @@ export default {
           type: 'radio',
           label: '桂味',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_103: {
-          vif: data => data.breed_103,
+          disabled: data => !data.breed_103,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -260,7 +284,7 @@ export default {
           layout: 8
         },
         yield_103: {
-          vif: data => data.breed_103,
+          disabled: data => !data.breed_103,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -274,14 +298,14 @@ export default {
           type: 'radio',
           label: '黑叶',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_104: {
-          vif: data => data.breed_104,
+          disabled: data => !data.breed_104,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -291,7 +315,7 @@ export default {
           layout: 8
         },
         yield_104: {
-          vif: data => data.breed_104,
+          disabled: data => !data.breed_104,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -305,14 +329,14 @@ export default {
           type: 'radio',
           label: '糯米糍',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_105: {
-          vif: data => data.breed_105,
+          disabled: data => !data.breed_105,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -322,7 +346,7 @@ export default {
           layout: 8
         },
         yield_105: {
-          vif: data => data.breed_105,
+          disabled: data => !data.breed_105,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -336,14 +360,14 @@ export default {
           type: 'radio',
           label: '怀枝',
           required: true,
-          layout: 24,
+          layout: 8,
           options: [
             { text: '有生产', value: 1 },
             { text: '未生产', value: 0 }
           ]
         },
         scale_106: {
-          vif: data => data.breed_106,
+          disabled: data => !data.breed_106,
           type: 'number',
           label: '采收面积',
           attrs: {
@@ -353,7 +377,7 @@ export default {
           layout: 8
         },
         yield_106: {
-          vif: data => data.breed_106,
+          disabled: data => !data.breed_106,
           type: 'number',
           label: '预计产量',
           attrs: {
@@ -365,8 +389,28 @@ export default {
       },
       myFormData: this.formData,
       rules: {
-        phone: [{ validator: phone, trigger: 'blur' }]
+        phone: [{ validator: phone, trigger: 'blur' }],
+        scale: [{ validator: isZero, trigger: 'blur' }],
+        yield: [{ validator: isZero, trigger: 'blur' }],
+        scale_101: [{ validator: isZero, trigger: 'blur' }],
+        yield_101: [{ validator: isZero, trigger: 'blur' }],
+        scale_102: [{ validator: isZero, trigger: 'blur' }],
+        yield_102: [{ validator: isZero, trigger: 'blur' }],
+        scale_103: [{ validator: isZero, trigger: 'blur' }],
+        yield_103: [{ validator: isZero, trigger: 'blur' }],
+        scale_104: [{ validator: isZero, trigger: 'blur' }],
+        yield_104: [{ validator: isZero, trigger: 'blur' }],
+        scale_105: [{ validator: isZero, trigger: 'blur' }],
+        yield_105: [{ validator: isZero, trigger: 'blur' }],
+        scale_106: [{ validator: isZero, trigger: 'blur' }],
+        yield_106: [{ validator: isZero, trigger: 'blur' }]
       }
+    }
+  },
+  computed: {
+    ...mapGetters(['device', 'roles']),
+    isShowSubmit() {
+      return !this.roles.includes('shiji')
     }
   },
   methods: {
@@ -423,8 +467,10 @@ export default {
 </script>
 
 <style lang="scss">
-// .form-wrapper {
-//   background-color: #efefef;
-//   width: 50%;
-// }
+.form-wrapper {
+  .el-button {
+    position: absolute;
+    right: 0;
+  }
+}
 </style>
