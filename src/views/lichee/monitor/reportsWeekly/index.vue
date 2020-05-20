@@ -1,7 +1,7 @@
 <template>
   <div>
     <lb-table
-      :column="tableData.column"
+      :column="tableColumn"
       :data="tableData.data"
       :merge="['issue']"
       border
@@ -17,6 +17,7 @@ import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
 import { queryIssueByUnitId, queryIssueByBaseId } from '@/api/task'
 import { parseTime } from '@/utils/index'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'ReportsWeekly',
@@ -83,13 +84,67 @@ export default {
             }
           }
         ],
+        mobileColumn: [
+          {
+            prop: 'issue',
+            label: '期号'
+          },
+          {
+            prop: 'name',
+            label: '基地名称',
+            minWidth: '100px'
+          },
+          {
+            label: '操作',
+            render: (h, scope) => {
+              return (
+                <div>
+                  <el-button
+                    size='mini'
+                    type='primary'
+                    onClick={() => {
+                      this.handleEdit(scope.$index, scope.row)
+                    }}
+                  >
+                    填报
+                  </el-button>
+                </div>
+              )
+            }
+          },
+          {
+            prop: 'state',
+            label: '填报状态',
+            render: (h, scope) => {
+              return (
+                <div>
+                  <el-tag type={stateMap[scope.row.state].type}>
+                    {stateMap[scope.row.state].label}
+                  </el-tag>
+                </div>
+              )
+            }
+          },
+
+          {
+            prop: 'endTime',
+            label: '截止日期',
+            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
+          }
+        ],
         data: []
       }
     }
   },
   computed: {
+    ...mapGetters(['device']),
     roles() {
       return this.$store.getters.roles
+    },
+    tableColumn() {
+      return this.device === 'desktop'
+        ? this.tableData.column
+        : this.tableData.mobileColumn
     }
   },
   mounted() {
@@ -98,12 +153,10 @@ export default {
   methods: {
     handleEdit(index, row) {
       const { id } = row
-
       this.$router.push({
         path: '/lichee/weeklyForm',
         query: { id }
       })
-      console.log(index, row)
     },
     getIssue(roles) {
       if (roles.includes('nongye')) {

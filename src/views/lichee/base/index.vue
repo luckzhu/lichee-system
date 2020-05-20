@@ -29,7 +29,7 @@
 import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
 import AddBaseForm from './components/AddBaseForm'
-import { queryBase, queryBaseByRegionCode, validBase } from '@/api/base'
+import { queryBase, queryBaseByRegionCode, validBase, generateBaseAccount } from '@/api/base'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -118,9 +118,10 @@ export default {
           },
           {
             label: '操作',
+            width: '200px',
             render: (h, scope) => {
               return (
-                <div>
+                <div className='button-group'>
                   <el-button
                     type='primary'
                     onClick={() => {
@@ -128,6 +129,15 @@ export default {
                     }}
                   >
                     {this.roles.includes('shiji') ? '审核' : '查看'}
+                  </el-button>
+                  <el-button
+                    type='warning'
+                    disabled={scope.row.state !== 2}
+                    onClick={() => {
+                      this.createBaseAccount(scope.row)
+                    }}
+                  >
+                    创建基地账号
                   </el-button>
                 </div>
               )
@@ -189,7 +199,10 @@ export default {
       })
     },
     toBaseForm(row) {
-      this.disabled = true
+      if (row.state !== 3) {
+        this.disabled = true
+      }
+
       const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
       this.baseId = row.id
@@ -216,6 +229,18 @@ export default {
           this.tableData.data = res.rows
         })
       }
+    },
+    // 审核通过后创建基地账号
+    createBaseAccount(row) {
+      generateBaseAccount({ id: row.id }).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            message: '基地账号创建成功！',
+            type: 'success'
+          })
+        }
+        console.log(res)
+      })
     }
   }
 }
@@ -224,6 +249,10 @@ export default {
 <style lang="scss" scoped>
 .add {
   margin-bottom: 20px;
+}
+.button-group {
+  display: flex;
+  justify-content: center;
 }
 </style>
 

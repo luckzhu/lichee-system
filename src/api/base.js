@@ -47,3 +47,11 @@ export function validBase(data) {
     data
   })
 }
+// 生成基地账号 基地id
+export function generateBaseAccount(data) {
+  return request({
+    url: '/base/generateBaseAccount',
+    method: 'post',
+    data
+  })
+}

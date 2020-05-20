@@ -16,7 +16,6 @@
         :column="tableData.column"
         :data="tableData.data"
         border
-        stripe
         align="center"
       />
 
@@ -24,8 +23,8 @@
     </div>
 
     <footer>
-      <el-button type="primary" :loading="btnLoading" @click="save">保存但不提交</el-button>
-      <el-button type="success" @click="submit">数据无误并提交</el-button>
+      <el-button :disabled="disabled" type="primary" :loading="btnLoading" @click="save">保存但不提交</el-button>
+      <el-button :disabled="disabled" type="success" @click="submit">数据无误并提交</el-button>
     </footer>
   </div>
 </template>
@@ -60,7 +59,7 @@ export default {
             render: (h, scope) => {
               return (
                 <div>
-                  <el-radio-group v-model={scope.row.i1}>
+                  <el-radio-group v-model={scope.row.i1} disabled={this.disabled}>
                     <el-radio label={1}>是</el-radio>
                     <el-radio label={0}>否</el-radio>
                   </el-radio-group>
@@ -82,7 +81,7 @@ export default {
                         v-model={scope.row.d1}
                         controls={false}
                         size='small'
-                        disabled={!scope.row.i1}
+                        disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
                     </div>
                   )
@@ -99,7 +98,7 @@ export default {
                         v-model={scope.row.d2}
                         controls={false}
                         size='small'
-                        disabled={!scope.row.i1}
+                        disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
                     </div>
                   )
@@ -116,7 +115,7 @@ export default {
                         v-model={scope.row.d3}
                         controls={false}
                         size='small'
-                        disabled={!scope.row.i1}
+                        disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
                     </div>
                   )
@@ -138,7 +137,7 @@ export default {
                         v-model={scope.row.d4}
                         controls={false}
                         size='small'
-                        disabled={!scope.row.i1}
+                        disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
                     </div>
                   )
@@ -155,7 +154,7 @@ export default {
                         v-model={scope.row.d5}
                         controls={false}
                         size='small'
-                        disabled={!scope.row.i1}
+                        disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
                     </div>
                   )
@@ -172,7 +171,7 @@ export default {
                 <div>
                   <el-radio-group
                     v-model={scope.row.i2}
-                    disabled={!scope.row.i1}
+                    disabled={!scope.row.i1 || this.disabled}
                   >
                     <el-radio label={1}>上涨 </el-radio>
                     <el-radio label={2}>持平</el-radio>
@@ -185,7 +184,9 @@ export default {
         ],
         data: []
       },
-      issue: {},
+      issue: {
+        state: null
+      },
       baseinfo: {},
       breed: [],
       btnLoading: false
@@ -201,6 +202,15 @@ export default {
       const WIDTH = 992
       const rect = body.getBoundingClientRect()
       return rect.width - 1 < WIDTH
+    },
+    disabled() {
+      const { state } = this.issue
+      console.log(state)
+      if (state === -1 || state === 0) {
+        return false
+      } else {
+        return true
+      }
     }
   },
   mounted() {
@@ -227,7 +237,6 @@ export default {
       this.postData(1)
     },
     validate(data) {
-      console.log(this.tableData.data)
       const message = []
       const requiredArr = [
         { field: 'd1', label: '基地本周上市量' },
