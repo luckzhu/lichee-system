@@ -33,6 +33,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    baseId: {
+      type: Number,
+      default: -1
     }
   },
   data() {
@@ -450,6 +454,9 @@ export default {
       obj.bId = 100 // 代表荔枝
       obj.data = JSON.stringify(data)
 
+      if (this.baseId !== -1) {
+        obj.id = this.baseId
+      }
       return obj
     },
     handleSuccess(data) {

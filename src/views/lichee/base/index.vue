@@ -13,7 +13,7 @@
         top="10vh"
         center
       >
-        <add-base-form ref="addBaseForm" :key="baseId" :form-data="formData" :disabled="disabled" />
+        <add-base-form ref="addBaseForm" :key="baseId" :form-data="formData" :disabled="disabled" :base-id="baseId" />
         <div v-if="roles.includes('shiji')" slot="footer" class="dialog-footer">
           <el-button :disabled="approved" type="primary" @click="approve">审核通过</el-button>
           <el-button :disabled="approved" type="danger" @click="sendBack">退回</el-button>
@@ -141,7 +141,10 @@ export default {
                   content='生成基地账号后，基地可用手机短信登录系统'
                   placement='top-start'
                 >
-                  <div class='title-icon'>{scope.column.label}<i class='el-icon-warning'></i></div>
+                  <div class='title-icon'>
+                    {scope.column.label}
+                    <i class='el-icon-warning'></i>
+                  </div>
                 </el-tooltip>
               )
             },
@@ -153,6 +156,21 @@ export default {
                     {haveAccount ? '已生成' : '未生成'}
                   </el-tag>
                 </div>
+              )
+            }
+          },
+          {
+            label: '操作',
+            render: (h, scope) => {
+              return (
+                <el-button
+                  type='info'
+                  onClick={() => {
+                    this.editForm(scope.row)
+                  }}
+                >
+                  {'编辑'}
+                </el-button>
               )
             }
           },
@@ -177,7 +195,7 @@ export default {
               return (
                 <div className='button-group'>
                   <el-button
-                    type={scope.row.state !== 2 ? 'primary' : 'warning'}
+                    type={(this.roles.includes('shiji') && scope.row.state !== 2) || !this.roles.includes('shiji') ? 'primary' : 'warning'}
                     onClick={() => {
                       this.toBaseForm(scope.row)
                     }}
@@ -257,11 +275,19 @@ export default {
       } else {
         this.approved = false
       }
-      const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
       this.baseId = row.id
-      temp.regionCode = [temp.regionCode.substring(0, 4), temp.regionCode]
+      this.formData = JSON.parse(JSON.stringify(this.revertData(row)))
+    },
+    editForm(row) {
+      this.dialogFormVisible = true
+      this.baseId = row.id
+      this.formData = JSON.parse(JSON.stringify(this.revertData(row)))
+    },
 
+    revertData(row) {
+      const temp = JSON.parse(JSON.stringify(row))
+      temp.regionCode = [temp.regionCode.substring(0, 4), temp.regionCode]
       const bIds = ['101', '102', '103', '104', '105', '106']
       bIds.forEach(item => {
         temp[`breed_${item}`] = 0
@@ -271,7 +297,7 @@ export default {
         temp[`scale_${item.bId}`] = item.scale
         temp[`yield_${item.bId}`] = item.yield
       })
-      this.formData = JSON.parse(JSON.stringify(temp))
+      return temp
     },
     getBaseList(roles) {
       if (roles.includes('shiji')) {
@@ -307,7 +333,7 @@ export default {
   display: flex;
   justify-content: center;
 }
-.title-icon{
+.title-icon {
   display: flex;
 }
 </style>
