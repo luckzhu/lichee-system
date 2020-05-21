@@ -51,3 +51,21 @@ export function checkOrgCode(params) {
     params
   })
 }
+
+// 获取手机短信验证码
+export function getMsg(params) {
+  return request({
+    url: '/auth/getMsg',
+    method: 'get',
+    params
+  })
+}
+
+// 手机短信验证码登录
+export function phoneLogin(data) {
+  return request({
+    url: '/auth/phoneLogin',
+    method: 'post',
+    data
+  })
+}

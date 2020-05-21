@@ -1,11 +1,9 @@
-export function viewCode2Roles(arr) {
+export function viewCode2Roles(obj) {
   const roles = []
-  let name
-  arr.forEach(item => {
+  obj.permissioninfo.forEach(item => {
     if (item.viewCode && !roles.includes(item.viewCode)) {
       roles.push(item.viewCode)
     }
-    name = item.unitName
   })
-  return { roles, name }
+  return { roles, name: obj.name }
 }

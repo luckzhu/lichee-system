@@ -57,36 +57,45 @@ export const constantRoutes = [
       component: () => import('@/views/dashboard/index'),
       meta: { title: '个人信息', icon: 'dashboard' }
     }]
-  },
+  }
+
+]
+
+/**
+ * asyncRoutes
+ * the routes that need to be dynamically loaded based on user roles
+ */
+export const asyncRoutes = [
   {
     path: '/lichee',
     component: Layout,
     redirect: '/lichee/base',
+    alwaysShow: true,
     meta: { title: '广东荔枝', icon: 'litchee' },
     children: [
       {
         path: 'base',
         name: 'Base',
         component: () => import('@/views/lichee/base'),
-        meta: { title: '基地信息登记', icon: 'info' }
+        meta: { title: '基地信息登记', icon: 'info', roles: ['nongye', 'shiji'] }
       },
       {
         path: 'brand',
         name: 'Brand',
         component: () => import('@/views/lichee/brand'),
-        meta: { title: '品牌标识申领', icon: 'brand' }
+        meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye', 'shiji'] }
       },
       {
         path: 'contract',
         name: 'Contract',
         component: () => import('@/views/lichee/contract'),
-        meta: { title: '合同备案登记', icon: 'register' }
+        meta: { title: '合同备案登记', icon: 'register', roles: ['nongye', 'shiji'] }
       },
       {
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/lichee/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor' }
+        meta: { title: '生产供应监测', icon: 'monitor', roles: ['nongye', 'shiji', 'jidi'] }
       },
       {
         path: 'weeklyForm',
@@ -99,17 +108,10 @@ export const constantRoutes = [
         path: 'subsidy',
         name: 'Subsidy',
         component: () => import('@/views/lichee/subsidy'),
-        meta: { title: '物流补助核准', icon: 'subsidy' }
+        meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye', 'shiji', 'wuliu'] }
       }
     ]
-  }
-]
-
-/**
- * asyncRoutes
- * the routes that need to be dynamically loaded based on user roles
- */
-export const asyncRoutes = [
+  },
   // {
   //   path: 'external-link',
   //   component: Layout,
