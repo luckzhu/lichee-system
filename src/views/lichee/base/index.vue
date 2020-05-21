@@ -15,8 +15,8 @@
       >
         <add-base-form ref="addBaseForm" :key="baseId" :form-data="formData" :disabled="disabled" />
         <div v-if="roles.includes('shiji')" slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="approve">审核通过</el-button>
-          <el-button type="danger" @click="sendBack">退回</el-button>
+          <el-button :disabled="approved" type="primary" @click="approve">审核通过</el-button>
+          <el-button :disabled="approved" type="danger" @click="sendBack">退回</el-button>
         </div>
       </el-dialog>
     </div>
@@ -29,7 +29,12 @@
 import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
 import AddBaseForm from './components/AddBaseForm'
-import { queryBase, queryBaseByRegionCode, validBase, generateBaseAccount } from '@/api/base'
+import {
+  queryBase,
+  queryBaseByRegionCode,
+  validBase,
+  generateBaseAccount
+} from '@/api/base'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -46,16 +51,19 @@ export default {
         column: [
           {
             prop: 'name',
-            label: '企业字号'
+            label: '企业字号',
+            width: '200px'
           },
           {
             prop: 'cityName',
-            label: '地级市/县（区）',
+            label: '市/县（区）',
+            width: '100px',
             formatter: row => row.cityName + row.countyName
           },
           {
             prop: 'address',
-            label: '基地详细地址'
+            label: '基地详细地址',
+            width: '160px'
           },
           {
             prop: 'contactName',
@@ -63,23 +71,28 @@ export default {
           },
           {
             prop: 'contactPhone',
-            label: '手机号'
+            label: '手机号',
+            width: '120px'
           },
           {
             prop: 'scale',
-            label: '基地面积（亩）'
+            label: '基地面积（亩）',
+            width: '120px'
           },
           {
             prop: 'yield',
-            label: '预计产量（公斤）'
+            label: '预计产量（公斤）',
+            width: '120px'
           },
           {
             prop: 'coldScale',
-            label: '冷库容积（m³）'
+            label: '冷库容积（m³）',
+            width: '120px'
           },
           {
             prop: 'coldCar',
-            label: '冷链车（台）'
+            label: '冷链车（台）',
+            width: '120px'
           },
           {
             prop: 'levelDevice',
@@ -104,13 +117,40 @@ export default {
           {
             prop: 'state',
             label: '状态',
+            width: '100px',
             render: (h, scope) => {
+              const { state } = scope.row
               return (
                 <div>
-                  <el-tag
-                    type={scope.row.state ? stateMap[scope.row.state].type : ''}
-                  >
-                    {scope.row.state ? stateMap[scope.row.state].label : ''}
+                  <el-tag type={state ? stateMap[state].type : ''}>
+                    {state !== 0 && !state ? '无状态' : stateMap[state].label}
+                  </el-tag>
+                </div>
+              )
+            }
+          },
+          {
+            prop: 'haveAccount',
+            label: '基地账号',
+            width: '100px',
+            renderHeader: (h, scope) => {
+              return (
+                <el-tooltip
+                  class='item'
+                  effect='dark'
+                  content='生成基地账号后，基地可用手机短信登录系统'
+                  placement='top-start'
+                >
+                  <div class='title-icon'>{scope.column.label}<i class='el-icon-warning'></i></div>
+                </el-tooltip>
+              )
+            },
+            render: (h, scope) => {
+              const { haveAccount } = scope.row
+              return (
+                <div>
+                  <el-tag type={haveAccount ? 'success' : 'info'}>
+                    {haveAccount ? '已生成' : '未生成'}
                   </el-tag>
                 </div>
               )
@@ -118,18 +158,11 @@ export default {
           },
           {
             label: '操作',
-            width: '200px',
+            width: '240px',
             render: (h, scope) => {
-              return (
-                <div className='button-group'>
-                  <el-button
-                    type='primary'
-                    onClick={() => {
-                      this.toBaseForm(scope.row)
-                    }}
-                  >
-                    {this.roles.includes('shiji') ? '审核' : '查看'}
-                  </el-button>
+              let create
+              if (this.roles.includes('nongye')) {
+                create = (
                   <el-button
                     type='warning'
                     disabled={scope.row.state !== 2}
@@ -139,6 +172,21 @@ export default {
                   >
                     创建基地账号
                   </el-button>
+                )
+              }
+              return (
+                <div className='button-group'>
+                  <el-button
+                    type={scope.row.state !== 2 ? 'primary' : 'warning'}
+                    onClick={() => {
+                      this.toBaseForm(scope.row)
+                    }}
+                  >
+                    {this.roles.includes('shiji') && scope.row.state !== 2
+                      ? '审核'
+                      : '查看'}
+                  </el-button>
+                  {create}
                 </div>
               )
             }
@@ -147,7 +195,8 @@ export default {
         data: []
       },
       baseId: -1,
-      disabled: false
+      disabled: false,
+      approved: false
     }
   },
   computed: {
@@ -160,7 +209,6 @@ export default {
       }
     },
     dialogWidth() {
-      console.log(this.device)
       if (this.device === 'desktop') {
         return '1200px'
       } else {
@@ -199,10 +247,16 @@ export default {
       })
     },
     toBaseForm(row) {
+      // 除了退回再修改，提交后不让编辑
       if (row.state !== 3) {
         this.disabled = true
       }
-
+      // 审核通过后，禁用审核按钮
+      if (row.state === 2) {
+        this.approved = true
+      } else {
+        this.approved = false
+      }
       const temp = JSON.parse(JSON.stringify(row))
       this.dialogFormVisible = true
       this.baseId = row.id
@@ -239,7 +293,6 @@ export default {
             type: 'success'
           })
         }
-        console.log(res)
       })
     }
   }
@@ -253,6 +306,9 @@ export default {
 .button-group {
   display: flex;
   justify-content: center;
+}
+.title-icon{
+  display: flex;
 }
 </style>
 

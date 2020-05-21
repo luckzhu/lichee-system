@@ -35,7 +35,8 @@ export default {
           {
             prop: 'name',
             label: '基地名称',
-            minWidth: '100px'
+            minWidth: '100px',
+            formatter: () => this.$store.getters.name
           },
           {
             prop: 'dataBegin',
@@ -87,12 +88,22 @@ export default {
         mobileColumn: [
           {
             prop: 'issue',
-            label: '期号'
+            label: '期号',
+            width: '140px'
           },
           {
-            prop: 'name',
-            label: '基地名称',
-            minWidth: '100px'
+            prop: 'state',
+            label: '填报状态',
+            render: (h, scope) => {
+              const { state } = scope.row
+              return (
+                <div>
+                  <el-tag type={state ? stateMap[state].type : ''}>
+                    {state !== 0 && !state ? '无状态' : stateMap[state].label}
+                  </el-tag>
+                </div>
+              )
+            }
           },
           {
             label: '操作',
@@ -113,22 +124,9 @@ export default {
             }
           },
           {
-            prop: 'state',
-            label: '填报状态',
-            render: (h, scope) => {
-              return (
-                <div>
-                  <el-tag type={stateMap[scope.row.state].type}>
-                    {stateMap[scope.row.state].label}
-                  </el-tag>
-                </div>
-              )
-            }
-          },
-
-          {
             prop: 'endTime',
             label: '截止日期',
+            width: '100px',
             formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
           }
         ],
