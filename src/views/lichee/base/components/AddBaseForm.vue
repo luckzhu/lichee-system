@@ -393,21 +393,21 @@ export default {
       },
       myFormData: this.formData,
       rules: {
-        phone: [{ validator: phone, trigger: 'blur' }],
-        scale: [{ validator: isZero, trigger: 'blur' }],
-        yield: [{ validator: isZero, trigger: 'blur' }],
-        scale_101: [{ validator: isZero, trigger: 'blur' }],
-        yield_101: [{ validator: isZero, trigger: 'blur' }],
-        scale_102: [{ validator: isZero, trigger: 'blur' }],
-        yield_102: [{ validator: isZero, trigger: 'blur' }],
-        scale_103: [{ validator: isZero, trigger: 'blur' }],
-        yield_103: [{ validator: isZero, trigger: 'blur' }],
-        scale_104: [{ validator: isZero, trigger: 'blur' }],
-        yield_104: [{ validator: isZero, trigger: 'blur' }],
-        scale_105: [{ validator: isZero, trigger: 'blur' }],
-        yield_105: [{ validator: isZero, trigger: 'blur' }],
-        scale_106: [{ validator: isZero, trigger: 'blur' }],
-        yield_106: [{ validator: isZero, trigger: 'blur' }]
+        phone: [{ validator: phone, trigger: 'blur' }]
+        // scale: [{ validator: isZero, trigger: 'blur' }],
+        // yield: [{ validator: isZero, trigger: 'blur' }],
+        // scale_101: [{ validator: isZero, trigger: 'blur' }],
+        // yield_101: [{ validator: isZero, trigger: 'blur' }],
+        // scale_102: [{ validator: isZero, trigger: 'blur' }],
+        // yield_102: [{ validator: isZero, trigger: 'blur' }],
+        // scale_103: [{ validator: isZero, trigger: 'blur' }],
+        // yield_103: [{ validator: isZero, trigger: 'blur' }],
+        // scale_104: [{ validator: isZero, trigger: 'blur' }],
+        // yield_104: [{ validator: isZero, trigger: 'blur' }],
+        // scale_105: [{ validator: isZero, trigger: 'blur' }],
+        // yield_105: [{ validator: isZero, trigger: 'blur' }],
+        // scale_106: [{ validator: isZero, trigger: 'blur' }],
+        // yield_106: [{ validator: isZero, trigger: 'blur' }]
       }
     }
   },
