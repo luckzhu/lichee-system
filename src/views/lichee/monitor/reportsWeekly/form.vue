@@ -59,7 +59,10 @@ export default {
             render: (h, scope) => {
               return (
                 <div>
-                  <el-radio-group v-model={scope.row.i1} disabled={this.disabled}>
+                  <el-radio-group
+                    v-model={scope.row.i1}
+                    disabled={this.disabled}
+                  >
                     <el-radio label={1}>是</el-radio>
                     <el-radio label={0}>否</el-radio>
                   </el-radio-group>
@@ -197,12 +200,6 @@ export default {
     id() {
       return this.$route.query.id
     },
-    $_isMobile() {
-      const { body } = document
-      const WIDTH = 992
-      const rect = body.getBoundingClientRect()
-      return rect.width - 1 < WIDTH
-    },
     disabled() {
       const { state } = this.issue
       console.log(state)
@@ -215,7 +212,6 @@ export default {
   },
   mounted() {
     this.getFormData(this.id)
-    console.log(this.device)
   },
   methods: {
     getFormData(id) {
@@ -234,6 +230,7 @@ export default {
       this.postData(0)
     },
     submit() {
+      if (!this.validate(this.tableData.data)) return
       this.postData(1)
     },
     validate(data) {
@@ -248,8 +245,11 @@ export default {
       ]
 
       let valid = true
-      this.tableData.data.forEach(item => {
-        if (item.i1 === 1) {
+      data.forEach(item => {
+        if (item.i1 !== 0 && !item.i1) {
+          message.push(`请选择是否生产: ${licheeBreedMap.get(item.bId)}`)
+          valid = false
+        } else if (item.i1 === 1) {
           requiredArr.map(ele => {
             if (item[ele.field] !== 0 && !item[ele.field]) {
               message.push(
@@ -267,10 +267,10 @@ export default {
           callback: () => {}
         })
       }
+      console.log(valid)
       return valid
     },
     postData(state) {
-      if (!this.validate()) return
       this.btnLoading = true
       const { id } = this
       const tempData = JSON.parse(JSON.stringify(this.tableData.data))
@@ -279,14 +279,13 @@ export default {
         for (const key in item) {
           if (fieldName.includes(key)) delete item[key]
         }
-        console.log(item)
         if (item.i1 === 0) {
-          item.d1 = 0
-          item.d2 = 0
-          item.d3 = 0
-          item.d4 = 0
-          item.d5 = 0
-          item.i2 = 0
+          delete item.d1
+          delete item.d2
+          delete item.d3
+          delete item.d4
+          delete item.d5
+          delete item.i2
         }
         item.name = licheeBreedMap.get(item.bId)
         item.biId = id

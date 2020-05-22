@@ -126,9 +126,11 @@ export default {
     }
     return {
       loginForm: {
-        account: 'mtp6300138',
-        password: 'mtp6300138',
-        phone: '18110294220',
+        // account: 'mtp6300138',
+        // password: 'mtp6300138',
+        account: '',
+        password: '',
+        phone: '',
         code: ''
       },
       loginRules: {

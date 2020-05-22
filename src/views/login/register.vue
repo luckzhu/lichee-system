@@ -16,7 +16,13 @@
         submit-btn-text="注册"
         @request-success="handleSuccess"
         @request-error="handleError"
-      />
+      >
+        <!-- 存在初始校验的bug,所以改为slot -->
+        <template v-slot:regionCode="{ desc, data, field, formData }">
+          <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
+        </template>
+      </ele-form>
+
       <div class="tips">
         <router-link to="/login">
           <span>已有账号？立即登录</span>
@@ -61,12 +67,6 @@ export default {
           if (res.code === 201) {
             callback(new Error('该统一社会信用代码的企业已存在'))
           } else if (res.code === 200) {
-            // const data = res.data.info
-            // data.regionCode = [data.regionCode.substring(0, 4), data.regionCode]
-            // data.unitName = data.name
-            // data.roleId = 1
-            // this.formData = data
-            // console.log(this.formData)
             callback()
           } else {
             callback()
@@ -74,21 +74,32 @@ export default {
         })
       }
     }
-    // const account = (rule, value, callback) => {
-    //   if (value === '') {
-    //     callback(new Error('请填写用户名'))
-    //   } else {
-    //     checkAccount({ account: value }).then(res => {
-    //       if (res.code === 201) {
-    //         callback(new Error('用户名已存在'))
-    //       } else {
-    //         callback()
-    //       }
-    //     })
-    //   }
-    // }
 
     return {
+      cascaderProps: {
+        lazy: true,
+        value: 'code',
+        label: 'name',
+        lazyLoad(node, resolve) {
+          const { level } = node
+          if (level === 0) {
+            queryRegion().then(res => {
+              const nodes = res.filter(item => item.type === 1)
+              resolve(nodes)
+            })
+          } else {
+            const { code } = node.data
+            queryRegion({ code }).then(res => {
+              const nodes = res.filter(item => item.type === 2).map(item => ({
+                code: item.code,
+                name: item.name,
+                leaf: true
+              }))
+              resolve(nodes)
+            })
+          }
+        }
+      },
       // 表单数据
       formData: {},
       formDesc: {
@@ -98,35 +109,8 @@ export default {
           required: true // 必填简写
         },
         regionCode: {
-          type: 'cascader',
           label: '地级市/县（区）',
-          required: true,
-          attrs: {
-            props: {
-              lazy: true,
-              value: 'code',
-              label: 'name',
-              lazyLoad(node, resolve) {
-                const { level } = node
-                if (level === 0) {
-                  queryRegion().then(res => {
-                    const nodes = res.filter(item => item.type === 1)
-                    resolve(nodes)
-                  })
-                } else {
-                  const { code } = node.data
-                  queryRegion({ code }).then(res => {
-                    const nodes = res.map(item => ({
-                      code: item.code,
-                      name: item.name,
-                      leaf: true
-                    }))
-                    resolve(nodes)
-                  })
-                }
-              }
-            }
-          }
+          required: true
         },
         orgCode: {
           type: 'input',
@@ -193,14 +177,6 @@ export default {
             min: 5,
             max: 120,
             message: '单位名称至少5个字符,最多120个字符！',
-            trigger: 'blur'
-          }
-        ],
-        user_name: [
-          {
-            min: 2,
-            max: 16,
-            message: '长度在 2 到 16 个字符,由字母开头，可由字母和数字组成!',
             trigger: 'blur'
           }
         ],

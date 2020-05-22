@@ -35,8 +35,7 @@ export default {
           {
             prop: 'name',
             label: '基地名称',
-            minWidth: '100px',
-            formatter: () => this.$store.getters.name
+            minWidth: '100px'
           },
           {
             prop: 'dataBegin',
@@ -94,6 +93,7 @@ export default {
           {
             prop: 'state',
             label: '填报状态',
+            width: '80px',
             render: (h, scope) => {
               const { state } = scope.row
               return (

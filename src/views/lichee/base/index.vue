@@ -13,10 +13,17 @@
         top="10vh"
         center
       >
-        <add-base-form ref="addBaseForm" :key="baseId" :form-data="formData" :disabled="disabled" :base-id="baseId" />
+        <add-base-form
+          ref="addBaseForm"
+          :key="baseId"
+          :form-data="formData"
+          :disabled="disabled"
+          :base-id="baseId"
+          @closeDialog="closeDialog"
+        />
         <div v-if="roles.includes('shiji')" slot="footer" class="dialog-footer">
-          <el-button :disabled="approved" type="primary" @click="approve">审核通过</el-button>
-          <el-button :disabled="approved" type="danger" @click="sendBack">退回</el-button>
+          <el-button :disabled="approved" :loading="btnLoading" type="primary" @click="approve">审核通过</el-button>
+          <el-button :disabled="approved" :loading="btnLoading" type="danger" @click="sendBack">退回</el-button>
         </div>
       </el-dialog>
     </div>
@@ -52,7 +59,7 @@ export default {
           {
             prop: 'name',
             label: '企业字号',
-            width: '200px'
+            width: '220px'
           },
           {
             prop: 'cityName',
@@ -97,22 +104,22 @@ export default {
           {
             prop: 'levelDevice',
             label: '分级设备',
-            formatter: row => (row.classifyingEquipments ? '有' : '无')
+            formatter: row => (row.levelDevice ? '有' : '无')
           },
           {
             prop: 'packDevice',
             label: '打包设备',
-            formatter: row => (row.balingEquipment ? '有' : '无')
+            formatter: row => (row.packDevice ? '有' : '无')
           },
           {
             prop: 'arrestPoint',
             label: '快递驻点',
-            formatter: row => (row.expressSite ? '有' : '无')
+            formatter: row => (row.arrestPoint ? '有' : '无')
           },
           {
             prop: 'exportFile',
             label: '出口备案',
-            formatter: row => (row.exportFiling ? '有' : '无')
+            formatter: row => (row.exportFile ? '有' : '无')
           },
           {
             prop: 'state',
@@ -195,7 +202,12 @@ export default {
               return (
                 <div className='button-group'>
                   <el-button
-                    type={(this.roles.includes('shiji') && scope.row.state !== 2) || !this.roles.includes('shiji') ? 'primary' : 'warning'}
+                    type={
+                      (this.roles.includes('shiji') && scope.row.state !== 2) ||
+                      !this.roles.includes('shiji')
+                        ? 'primary'
+                        : 'warning'
+                    }
                     onClick={() => {
                       this.toBaseForm(scope.row)
                     }}
@@ -214,7 +226,8 @@ export default {
       },
       baseId: -1,
       disabled: false,
-      approved: false
+      approved: false,
+      btnLoading: false
     }
   },
   computed: {
@@ -228,7 +241,7 @@ export default {
     },
     dialogWidth() {
       if (this.device === 'desktop') {
-        return '1200px'
+        return '1400px'
       } else {
         return '95%'
       }
@@ -245,24 +258,36 @@ export default {
       this.dialogFormVisible = true
     },
     approve() {
-      validBase({ id: this.baseId, state: 2 }).then(res => {
-        if (res.code === 200) {
-          this.$message({
-            message: '审核通过',
-            type: 'success'
-          })
-        }
-      })
+      this.btnLoading = true
+      validBase({ id: this.baseId, state: 2 })
+        .then(res => {
+          if (res.code === 200) {
+            this.$message({
+              message: '审核通过',
+              type: 'success'
+            })
+            this.closeDialog()
+          }
+        })
+        .finally(() => {
+          this.btnLoading = false
+        })
     },
     sendBack() {
-      validBase({ id: this.baseId, state: 3 }).then(res => {
-        if (res.code === 200) {
-          this.$message({
-            message: '退回成功',
-            type: 'success'
-          })
-        }
-      })
+      this.btnLoading = true
+      validBase({ id: this.baseId, state: 3 })
+        .then(res => {
+          if (res.code === 200) {
+            this.$message({
+              message: '退回成功',
+              type: 'success'
+            })
+            this.closeDialog()
+          }
+        })
+        .finally(() => {
+          this.btnLoading = false
+        })
     },
     toBaseForm(row) {
       // 除了退回再修改，提交后不让编辑
@@ -318,8 +343,13 @@ export default {
             message: '基地账号创建成功！',
             type: 'success'
           })
+          this.getBaseList(this.roles)
         }
       })
+    },
+    closeDialog() {
+      this.dialogFormVisible = false
+      this.getBaseList(this.roles)
     }
   }
 }

@@ -14,7 +14,21 @@
       :request-fn="handleSubmit"
       @request-success="handleSuccess"
       @request-error="handleError"
-    />
+    >
+      <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
+      <template v-for="item in numFields" v-slot:[item]="{ desc, data, field, formData }">
+        <el-input-number
+          :key="item"
+          v-model="formData[item]"
+          :controls="false"
+          :step-strictly="item === 'coldCar' ? true:false"
+        />
+      </template>
+      <!-- 存在初始校验的bug,所以改为slot -->
+      <template v-slot:regionCode="{ desc, data, field, formData }">
+        <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
+      </template>
+    </ele-form>
   </div>
 </template>
 
@@ -48,25 +62,58 @@ export default {
         callback()
       }
     }
-    const isZero = (rule, value, callback) => {
-      if (rule.field.charAt(5) === '_') {
-        console.log(rule.field)
-        const breedCode = rule.field.split('_')[1]
-        const isOn = this.myFormData[`breed_${breedCode}`]
-        if (isOn === 1 && value === 0) {
-          callback(new Error('该指标不能为0'))
-        } else {
-          callback()
-        }
+    const ifRequired = (rule, value, callback) => {
+      const breedCode = rule.field.split('_')[1]
+      const isOn = this.myFormData[`breed_${breedCode}`]
+      if (isOn === 1 && value !== 0 && !value) {
+        callback(new Error('请填写该指标'))
       } else {
-        if (value === 0) {
-          callback(new Error('该指标不能为0'))
-        } else {
-          callback()
-        }
+        callback()
       }
     }
     return {
+      numFields: [
+        'scale',
+        'yield',
+        'coldScale',
+        'coldCar',
+        'scale_101',
+        'yield_101',
+        'scale_102',
+        'yield_102',
+        'scale_103',
+        'yield_103',
+        'scale_104',
+        'yield_104',
+        'scale_105',
+        'yield_105',
+        'scale_106',
+        'yield_106'
+      ],
+      cascaderProps: {
+        lazy: true,
+        value: 'code',
+        label: 'name',
+        lazyLoad(node, resolve) {
+          const { level } = node
+          if (level === 0) {
+            queryRegion().then(res => {
+              const nodes = res.filter(item => item.type === 1)
+              resolve(nodes)
+            })
+          } else {
+            const { code } = node.data
+            queryRegion({ code }).then(res => {
+              const nodes = res.filter(item => item.type === 2).map(item => ({
+                code: item.code,
+                name: item.name,
+                leaf: true
+              }))
+              resolve(nodes)
+            })
+          }
+        }
+      },
       isLoading: false,
       formError: {},
       // 表单数据
@@ -77,36 +124,9 @@ export default {
           required: true // 必填简写
         },
         regionCode: {
-          type: 'cascader',
           label: '地级市/县（区）',
           required: true,
-          layout: 12,
-          attrs: {
-            props: {
-              lazy: true,
-              value: 'code',
-              label: 'name',
-              lazyLoad(node, resolve) {
-                const { level } = node
-                if (level === 0) {
-                  queryRegion().then(res => {
-                    const nodes = res.filter(item => item.type === 1)
-                    resolve(nodes)
-                  })
-                } else {
-                  const { code } = node.data
-                  queryRegion({ code }).then(res => {
-                    const nodes = res.map(item => ({
-                      code: item.code,
-                      name: item.name,
-                      leaf: true
-                    }))
-                    resolve(nodes)
-                  })
-                }
-              }
-            }
-          }
+          layout: 12
         },
         address: {
           type: 'input',
@@ -130,36 +150,22 @@ export default {
           layout: 12
         },
         scale: {
-          type: 'number',
           label: '基地面积（亩）',
-          attrs: {
-            controls: false
-          },
           layout: 12,
           required: true // 必填简写
         },
         yield: {
-          type: 'number',
           label: '预计产量（公斤）',
-          attrs: {
-            controls: false
-          },
           layout: 12,
           required: true // 必填简写
         },
         coldScale: {
-          type: 'number',
           label: '冷库容积（m³）',
-          attrs: {
-            controls: false
-          },
           layout: 12
         },
         coldCar: {
-          type: 'number',
           label: '冷链车（台）',
           attrs: {
-            controls: false,
             'step-strictly': true
           },
           layout: 12
@@ -216,23 +222,11 @@ export default {
           ]
         },
         scale_101: {
-          disabled: data => !data.breed_101,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_101: {
-          disabled: data => !data.breed_101,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         },
 
@@ -247,23 +241,11 @@ export default {
           ]
         },
         scale_102: {
-          disabled: data => !data.breed_102,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_102: {
-          disabled: data => !data.breed_102,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         },
 
@@ -278,23 +260,11 @@ export default {
           ]
         },
         scale_103: {
-          disabled: data => !data.breed_103,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_103: {
-          disabled: data => !data.breed_103,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         },
 
@@ -309,23 +279,11 @@ export default {
           ]
         },
         scale_104: {
-          disabled: data => !data.breed_104,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_104: {
-          disabled: data => !data.breed_104,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         },
 
@@ -340,23 +298,11 @@ export default {
           ]
         },
         scale_105: {
-          disabled: data => !data.breed_105,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_105: {
-          disabled: data => !data.breed_105,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         },
 
@@ -371,43 +317,29 @@ export default {
           ]
         },
         scale_106: {
-          disabled: data => !data.breed_106,
-          type: 'number',
-          label: '采收面积',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '采收面积（亩）',
           layout: 8
         },
         yield_106: {
-          disabled: data => !data.breed_106,
-          type: 'number',
-          label: '预计产量',
-          attrs: {
-            controls: false
-          },
-          required: true,
+          label: '预计产量（公斤）',
           layout: 8
         }
       },
       myFormData: this.formData,
       rules: {
-        phone: [{ validator: phone, trigger: 'blur' }]
-        // scale: [{ validator: isZero, trigger: 'blur' }],
-        // yield: [{ validator: isZero, trigger: 'blur' }],
-        // scale_101: [{ validator: isZero, trigger: 'blur' }],
-        // yield_101: [{ validator: isZero, trigger: 'blur' }],
-        // scale_102: [{ validator: isZero, trigger: 'blur' }],
-        // yield_102: [{ validator: isZero, trigger: 'blur' }],
-        // scale_103: [{ validator: isZero, trigger: 'blur' }],
-        // yield_103: [{ validator: isZero, trigger: 'blur' }],
-        // scale_104: [{ validator: isZero, trigger: 'blur' }],
-        // yield_104: [{ validator: isZero, trigger: 'blur' }],
-        // scale_105: [{ validator: isZero, trigger: 'blur' }],
-        // yield_105: [{ validator: isZero, trigger: 'blur' }],
-        // scale_106: [{ validator: isZero, trigger: 'blur' }],
-        // yield_106: [{ validator: isZero, trigger: 'blur' }]
+        contactPhone: [{ validator: phone, trigger: 'blur' }],
+        scale_101: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_101: [{ validator: ifRequired, trigger: 'blur' }],
+        scale_102: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_102: [{ validator: ifRequired, trigger: 'blur' }],
+        scale_103: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_103: [{ validator: ifRequired, trigger: 'blur' }],
+        scale_104: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_104: [{ validator: ifRequired, trigger: 'blur' }],
+        scale_105: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_105: [{ validator: ifRequired, trigger: 'blur' }],
+        scale_106: [{ validator: ifRequired, trigger: 'blur' }],
+        yield_106: [{ validator: ifRequired, trigger: 'blur' }]
       }
     }
   },
@@ -456,18 +388,17 @@ export default {
 
       if (this.baseId !== -1) {
         obj.id = this.baseId
+        delete obj.detail
       }
+      obj.state = 1
       return obj
     },
     handleSuccess(data) {
-      // 关闭弹窗
-      this.dialogFormVisible = false
-      // 重置formData
-      // this.formData = {}
       this.$message.success('基地提交成功，进入待审核状态')
+      this.$emit('closeDialog')
     },
     handleError(error) {
-      this.$message.success(error)
+      this.$message.error(error)
     }
   }
 }
