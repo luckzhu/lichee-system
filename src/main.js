@@ -6,6 +6,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import EleForm from 'vue-ele-form'
 
+import LbTable from '@/components/LbTable'
+Vue.component('LbTable', LbTable)
+
 import '@/styles/index.scss' // global css
 
 import App from './App'
