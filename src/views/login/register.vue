@@ -90,11 +90,13 @@ export default {
           } else {
             const { code } = node.data
             queryRegion({ code }).then(res => {
-              const nodes = res.filter(item => item.type === 2).map(item => ({
-                code: item.code,
-                name: item.name,
-                leaf: true
-              }))
+              const nodes = res
+                .filter(item => item.type === 2)
+                .map(item => ({
+                  code: item.code,
+                  name: item.name,
+                  leaf: true
+                }))
               resolve(nodes)
             })
           }
@@ -215,7 +217,13 @@ export default {
     },
 
     handleSuccess(data) {
-      this.$router.push('/')
+      this.$message({
+        message: '注册成功，3秒后跳转……',
+        type: 'success'
+      })
+      setTimeout(() => {
+        this.$router.push('/')
+      }, 3000)
     },
     // eslint-disable-next-line handle-callback-err
     handleError(error) {
