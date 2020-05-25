@@ -247,7 +247,7 @@ export default {
       let valid = true
       data.forEach(item => {
         if (item.i1 !== 0 && !item.i1) {
-          message.push(`请选择是否生产: ${licheeBreedMap.get(item.bId)}`)
+          message.push(`请选择是否上市: ${licheeBreedMap.get(item.bId)}`)
           valid = false
         } else if (item.i1 === 1) {
           requiredArr.map(ele => {
