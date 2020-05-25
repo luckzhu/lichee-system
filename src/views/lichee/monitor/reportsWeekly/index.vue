@@ -5,8 +5,8 @@
       :data="tableData.data"
       :merge="['issue']"
       border
-      stripe
       align="center"
+      :cell-class-name="cellClass"
     />
     <router-view />
   </div>
@@ -73,6 +73,7 @@ export default {
                   <el-button
                     size='mini'
                     type='primary'
+                    disabled={scope.row.currIssue === 0}
                     onClick={() => {
                       this.handleEdit(scope.$index, scope.row)
                     }}
@@ -113,6 +114,7 @@ export default {
                   <el-button
                     size='mini'
                     type='primary'
+                    disabled={scope.row.currIssue === 0}
                     onClick={() => {
                       this.handleEdit(scope.$index, scope.row)
                     }}
@@ -166,10 +168,18 @@ export default {
           this.tableData.data = res.rows
         })
       }
+    },
+    cellClass({ row, column, rowIndex, columnIndex }) {
+      if (row.currIssue === 1) {
+        return 'currIssue'
+      }
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+.currIssue {
+  color: #b33038;
+}
 </style>
