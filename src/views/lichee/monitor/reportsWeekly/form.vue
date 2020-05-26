@@ -20,10 +20,26 @@
       />
 
       <table-mobile v-else class="table-mobile" :table-data="tableData" />
+
+      <table class="table table-border table-bordered text-c breed-table content">
+        <tr>
+          <td>小结</td>
+          <td>
+            <el-input
+              v-model.trim="issue.content"
+              type="textarea"
+              :show-word-limit="true"
+              :maxlength="200"
+              :rows="3"
+              placeholder="果园现状及天气、病虫害等其他影响荔枝上市的情况。"
+            />
+          </td>
+        </tr>
+      </table>
     </div>
 
     <footer>
-      <el-button :disabled="disabled" type="primary" :loading="btnLoading" @click="save">保存但不提交</el-button>
+      <el-button :disabled="disabled" type="primary" @click="save">保存但不提交</el-button>
       <el-button :disabled="disabled" type="success" @click="submit">数据无误并提交</el-button>
     </footer>
   </div>
@@ -83,6 +99,7 @@ export default {
                       <el-input-number
                         v-model={scope.row.d1}
                         controls={false}
+                        min={0}
                         size='small'
                         disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
@@ -100,6 +117,7 @@ export default {
                       <el-input-number
                         v-model={scope.row.d2}
                         controls={false}
+                        min={0}
                         size='small'
                         disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
@@ -117,6 +135,7 @@ export default {
                       <el-input-number
                         v-model={scope.row.d3}
                         controls={false}
+                        min={0}
                         size='small'
                         disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
@@ -139,6 +158,7 @@ export default {
                       <el-input-number
                         v-model={scope.row.d4}
                         controls={false}
+                        min={0}
                         size='small'
                         disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
@@ -156,6 +176,7 @@ export default {
                       <el-input-number
                         v-model={scope.row.d5}
                         controls={false}
+                        min={0}
                         size='small'
                         disabled={!scope.row.i1 || this.disabled}
                       ></el-input-number>
@@ -188,7 +209,8 @@ export default {
         data: []
       },
       issue: {
-        state: null
+        state: null,
+        content: null
       },
       baseinfo: {},
       breed: [],
@@ -202,7 +224,6 @@ export default {
     },
     disabled() {
       const { state } = this.issue
-      console.log(state)
       if (state === -1 || state === 0) {
         return false
       } else {
@@ -222,6 +243,14 @@ export default {
         this.tableData.data = res.breed
         const { data } = res
         if (data.length > 0) {
+          data.forEach(item => {
+            for (const key in item) {
+              // 为了不让null值回显为0
+              if (item[key] === null) {
+                delete item[key]
+              }
+            }
+          })
           this.tableData.data = data
         }
       })
@@ -231,9 +260,23 @@ export default {
     },
     submit() {
       if (!this.validate(this.tableData.data)) return
-      this.postData(1)
+      this.$confirm('确认提交本期周报吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.postData(1)
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
     },
     validate(data) {
+      const { content } = this.issue
       const message = []
       const requiredArr = [
         { field: 'd1', label: '基地本周上市量' },
@@ -244,7 +287,14 @@ export default {
         { field: 'i2', label: '行情预判' }
       ]
 
+      const isBiggerThanZero = [
+        { field: 'd1', label: '基地本周上市量' },
+        { field: 'd2', label: '基地田头大宗最高价' },
+        { field: 'd3', label: '基地田头大宗最低价' }
+      ]
+
       let valid = true
+      // 数据必填
       data.forEach(item => {
         if (item.i1 !== 0 && !item.i1) {
           message.push(`请选择是否上市: ${licheeBreedMap.get(item.bId)}`)
@@ -258,8 +308,24 @@ export default {
               valid = false
             }
           })
+          // 必须大于0校验
+          isBiggerThanZero.map(ele => {
+            if (item[ele.field] <= 0) {
+              message.push(
+                `该项必须大于0: ${licheeBreedMap.get(item.bId)}-${ele.label}`
+              )
+              valid = false
+            }
+          })
         }
       })
+
+      // 小结必填
+      if (!content) {
+        valid = false
+        message.push('请填写小结')
+      }
+
       if (message.length > 0) {
         this.$alert(message.join('<br>'), '必填', {
           confirmButtonText: '确定',
@@ -267,12 +333,17 @@ export default {
           callback: () => {}
         })
       }
-      console.log(valid)
       return valid
     },
     postData(state) {
-      this.btnLoading = true
+      const loading = this.$loading({
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       const { id } = this
+      const { content } = this.issue
       const tempData = JSON.parse(JSON.stringify(this.tableData.data))
       const fieldName = ['id', 'scale', 'yield', 'baseId']
       tempData.forEach(item => {
@@ -291,14 +362,15 @@ export default {
         item.biId = id
       })
       const data = JSON.stringify(tempData)
-      addOrUpdateBaseData({ id, data, state })
+
+      addOrUpdateBaseData({ id, data, state, content })
         .then(res => {
-          this.btnLoading = false
           if (res.code === 200) {
             this.$message({
-              message: res.data.info,
+              message: '保存成功',
               type: 'success'
             })
+            this.getFormData(id)
           } else {
             this.$message({
               message: `保存失败 ${res.data.info}`,
@@ -306,8 +378,8 @@ export default {
             })
           }
         })
-        .catch(() => {
-          this.btnLoading = false
+        .finally(() => {
+          loading.close()
         })
     }
   }
@@ -330,8 +402,8 @@ footer {
   text-align: right;
 }
 
-.table-mobile {
-  margin-bottom: 60px;
+.content {
+  margin: 30px 0 60px 0;
 }
 </style>
 
