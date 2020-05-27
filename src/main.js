@@ -6,6 +6,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import EleForm from 'vue-ele-form'
 
+import EleFormUploadFile from 'vue-ele-form-upload-file'
+Vue.component('upload-file', EleFormUploadFile)
+
 import LbTable from '@/components/LbTable'
 Vue.component('LbTable', LbTable)
 

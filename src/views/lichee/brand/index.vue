@@ -30,14 +30,26 @@
       width="700px"
       @request-success="handleSuccess"
     >
-      <!-- select cascader 存在初始校验的bug,所以改为slot -->
-      <template v-for="item in secltedFields" v-slot:[item.field]="{ desc, data, field, formData }">
-        <el-select :key="item.field" v-model="formData[item.field]">
+      <!-- select 存在初始校验的bug,所以改为slot -->
+      <template v-slot:baseId="{ desc, data, field, formData }">
+        <el-select v-model="formData.baseId" @change="changeBreed">
           <el-option
-            v-for="option in item.options"
-            :key="option.value"
-            :label="option.label"
-            :value="option.value"
+            v-for="option in bases"
+            :key="option.id"
+            :label="option.name"
+            :value="option.id"
+          />
+        </el-select>
+      </template>
+
+      <!-- 品种根据上面的基地选择后动态变化 -->
+      <template v-slot:bId="{ desc, data, field, formData }">
+        <el-select v-model="formData.bId">
+          <el-option
+            v-for="option in breeds"
+            :key="option.id"
+            :label="licheeBreedMap.get(option.bId)"
+            :value="option.bId"
           />
         </el-select>
       </template>
@@ -47,33 +59,21 @@
 
 <script>
 import { licheeBreedMap } from '@/utils/submit'
+import { queryBase, addIdentification, cancelIdentification } from '@/api/base'
+
 export default {
   name: 'Brand',
   data() {
     return {
       // 控制是否显示
       dialogFormVisible: false,
-      secltedFields: [
-        {
-          field: 'base',
-          options: [
-            { label: 'xxxxxx基地01', value: 'xxxxxx基地01' },
-            { label: 'xxxxxx基地02', value: 'xxxxxx基地02' }
-          ]
-        },
-        {
-          field: 'bId',
-          options: [
-            { label: '妃子笑', value: 101 },
-            { label: '白糖罂', value: 102 },
-            { label: '桂味', value: 103 }
-          ]
-        }
-      ],
+      licheeBreedMap,
+      bases: [],
+      breeds: [],
       tableDesc: [
         {
           label: '生产基地',
-          prop: 'base'
+          prop: 'baseId'
         },
         {
           label: '品种',
@@ -83,20 +83,20 @@ export default {
         },
         {
           label: '数量（件）',
-          prop: 'quantity'
+          prop: 'num'
         },
         {
           label: '上市日期',
-          prop: 'marketDate'
+          prop: 'saleDay'
         },
         {
           label: '包装规格（公斤/件）',
-          prop: 'packingSize'
+          prop: 'packing'
         },
         {
           label: '总重（吨）',
-          prop: 'totalWeight',
-          formatter: row => (row.quantity * row.packingSize) / 1000,
+          prop: 'weight',
+          formatter: row => (row.num * row.packing) / 1000,
           renderHeader: (h, scope) => {
             return (
               <el-tooltip
@@ -141,7 +141,7 @@ export default {
                 <el-button
                   type='primary'
                   disabled={!!scope.row.batchNumber}
-                  onClick={() => this.GenerateBatchNumber(scope.row)}
+                  onClick={() => this.generateBatchNumber(scope.row)}
                 >
                   确定
                 </el-button>
@@ -159,18 +159,19 @@ export default {
       ],
       tableData: [
         {
-          base: 'xxxxxx基地01',
+          baseId: 'xxxxxx基地01',
           bId: 101,
-          quantity: 20,
-          marketDate: '20200512',
-          packingSize: 25,
+          num: 20,
+          saleDay: '20200512',
+          packing: 25,
+          weight: null,
           batchNumber: null,
           isCanceled: false
         }
       ],
       formData: {},
       formDesc: {
-        base: {
+        baseId: {
           label: '生产基地',
           required: true
         },
@@ -178,12 +179,12 @@ export default {
           label: '品种',
           required: true
         },
-        quantity: {
+        num: {
           type: 'input',
           label: '数量（件）',
           required: true
         },
-        marketDate: {
+        saleDay: {
           type: 'date',
           label: '上市日期',
           required: true,
@@ -191,7 +192,7 @@ export default {
             valueFormat: 'yyyyMMdd'
           }
         },
-        packingSize: {
+        packing: {
           type: 'input',
           label: '包装规格（公斤/件）',
           required: true
@@ -201,10 +202,24 @@ export default {
       rules: {}
     }
   },
+  mounted() {
+    this.getBaseAndBreed()
+  },
   methods: {
+    async getBaseAndBreed() {
+      const { rows: bases } = await queryBase()
+      this.bases = bases
+    },
+    changeBreed(baseId) {
+      const { detail: breeds } = this.bases.filter(
+        item => item.id === baseId
+      )[0]
+      this.breeds = breeds
+    },
     handleSubmit(data) {
-      // 模拟异步请求
-      return new Promise(resolve => {
+      return new Promise(async(resolve, reject) => {
+        const res = await addIdentification({ data })
+        console.log(res)
         resolve(data)
       })
     },
@@ -216,9 +231,9 @@ export default {
       this.formData = {}
       this.$message.success('创建成功')
     },
-    GenerateBatchNumber(row) {
+    generateBatchNumber(row) {
       // 地市编号A+基地序号01 日期20200530 本基地当天登记排序001
-      const batchNumber = row.marketDate + '001'
+      const batchNumber = row.saleDay + '001'
       this.$confirm(`将自动生产批号, ${batchNumber}，是否继续?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -251,7 +266,7 @@ export default {
       )
         .then(() => {
           row.isCanceled = true
-          this.$refs.brandTable.$refs.elTable.doLayout()
+
           this.$message({
             type: 'success',
             message: '作废成功!'

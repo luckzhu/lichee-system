@@ -55,3 +55,44 @@ export function generateBaseAccount(data) {
     data
   })
 }
+// 获取合同
+export function queryContract(params) {
+  return request({
+    url: '/base/queryContract',
+    method: 'get',
+    params
+  })
+}
+
+// 新增合同 BId bId baseId contractFile price purchase weight
+export function addContract(data) {
+  return request({
+    url: '/base/addContract',
+    method: 'post',
+    data
+  })
+}
+// 删除合同 合同id
+export function delContract(data) {
+  return request({
+    url: '/base/delContract',
+    method: 'post',
+    data
+  })
+}
+// 新增品牌标识
+export function addIdentification(data) {
+  return request({
+    url: '/base/addIdentification',
+    method: 'post',
+    data
+  })
+}
+// 作废品牌标识 品牌标识id
+export function cancelIdentification(data) {
+  return request({
+    url: '/base/cancelIdentification',
+    method: 'post',
+    data
+  })
+}

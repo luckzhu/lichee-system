@@ -82,14 +82,14 @@ export const asyncRoutes = [
       {
         path: 'brand',
         name: 'Brand',
-        hidden: true,
+        // hidden: true,
         component: () => import('@/views/lichee/brand'),
         meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye', 'shiji'] }
       },
       {
         path: 'contract',
         name: 'Contract',
-        hidden: true,
+        // hidden: true,
         component: () => import('@/views/lichee/contract'),
         meta: { title: '合同备案登记', icon: 'register', roles: ['nongye', 'shiji'] }
       },
