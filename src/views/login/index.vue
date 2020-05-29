@@ -98,11 +98,26 @@
         </router-link>
       </div>
     </el-form>
+
+    <el-dialog title="同步名牌账号" :visible.sync="syncDialogVisible" width="450px" top="25vh">
+      <el-form :model="syncForm" :rules="syncRules" label-width="100px" class="sync-form">
+        <el-form-item label="联系人" prop="contactName">
+          <el-input v-model="syncForm.contactName" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="contactPhone">
+          <el-input v-model="syncForm.contactPhone" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="syncDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleSyncAccount">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getMsg } from '@/api/user'
+import { getMsg, syncAccount } from '@/api/user'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -125,6 +140,7 @@ export default {
       }
     }
     return {
+      syncDialogVisible: false,
       loginForm: {
         // account: 'mtp6300138',
         // password: 'mtp6300138',
@@ -132,6 +148,10 @@ export default {
         password: '',
         phone: '',
         code: ''
+      },
+      syncForm: {
+        contactName: '',
+        contactPhone: ''
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur' }],
@@ -143,6 +163,13 @@ export default {
         code: [
           { required: true, trigger: 'blur' },
           { validator: code, trigger: 'blur' }
+        ]
+      },
+      syncRules: {
+        contactName: [{ required: true, trigger: 'blur' }],
+        contactPhone: [
+          { required: true, trigger: 'blur' },
+          { validator: phone, trigger: 'blur' }
         ]
       },
       loading: false,
@@ -193,10 +220,15 @@ export default {
             this.$store
               .dispatch('user/login', this.loginForm)
               .then(res => {
-                this.$router.push({ path: this.redirect || '/lichee/monitor' })
-                this.loading = false
+                if (res.code === 203) {
+                  this.confirmSync(res.message + '?')
+                } else if (res.code === 202) {
+                  window.location.href = `http://gdmpxt.org/${res.data.info.forwardUrl}`
+                } else {
+                  this.$router.push({ path: this.redirect || '/' })
+                }
               })
-              .catch(() => {
+              .finally(() => {
                 this.loading = false
               })
           }
@@ -206,12 +238,47 @@ export default {
         }
       })
     },
+    confirmSync(message) {
+      this.$confirm(message, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.syncDialogVisible = true
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+    },
+    async handleSyncAccount() {
+      const { account } = this.loginForm
+      const { contactName, contactPhone } = this.syncForm
+      const res = await syncAccount({ account, contactName, contactPhone })
+      if (res.code === 200) {
+        this.$alert(
+          `同步账号成功！账号为企业信用代码: ${res.data.info}，密码为原密码。`,
+          '提示',
+          {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.syncDialogVisible = false
+            }
+          }
+        )
+      }
+    },
     phoneLogin() {
       this.$store
         .dispatch('user/phonelogin', this.loginForm)
         .then(res => {
           // 202跳转到旧系统
-          if (res.code === 202) {
+          if (res.code === 203) {
+            this.confirmSync(res.message)
+          } else if (res.code === 202) {
             window.location.href = `http://gdmpxt.org/${res.data.info.forwardUrl}`
           } else {
             this.$router.push({ path: this.redirect || '/' })
@@ -311,6 +378,11 @@ $cursor: #fff;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     color: #454545;
+  }
+}
+.sync-form {
+  .el-form-item__label {
+    line-height: 42px;
   }
 }
 </style>
