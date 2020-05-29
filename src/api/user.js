@@ -15,6 +15,14 @@ export function getInfo(params) {
     params
   })
 }
+// 荔枝系统省级 440 abcd1234
+export function queryUnit(params) {
+  return request({
+    url: 'user/queryUnit',
+    method: 'get',
+    params
+  })
+}
 
 // 获取单位类型,角色列表
 export function queryRoles(params) {
@@ -65,6 +73,15 @@ export function getMsg(params) {
 export function phoneLogin(data) {
   return request({
     url: '/auth/phoneLogin',
+    method: 'post',
+    data
+  })
+}
+
+// 同步名牌账号 account  contactName contactPhone
+export function syncAccount(data) {
+  return request({
+    url: '/auth/syncAccount',
     method: 'post',
     data
   })

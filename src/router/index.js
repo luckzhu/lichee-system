@@ -71,7 +71,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/lichee/base',
     alwaysShow: true,
-    meta: { title: '广东荔枝登记', icon: 'litchee' },
+    meta: { title: '广东荔枝登记', icon: 'litchee', roles: ['nongye', 'shiji', 'jidi'] },
     children: [
       {
         path: 'base',
@@ -112,6 +112,21 @@ export const asyncRoutes = [
         hidden: true,
         component: () => import('@/views/lichee/subsidy'),
         meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye', 'shiji', 'wuliu'] }
+      }
+    ]
+  },
+  {
+    path: '/provincial',
+    component: Layout,
+    redirect: '/provincial/enterpriseInfo',
+    alwaysShow: true,
+    meta: { title: '省级查看', icon: 'litchee', roles: ['shengji'] },
+    children: [
+      {
+        path: 'enterpriseInfo',
+        name: 'EnterpriseInfo',
+        component: () => import('@/views/provincial/enterpriseInfo'),
+        meta: { title: '企业信息', icon: 'info' }
       }
     ]
   },
