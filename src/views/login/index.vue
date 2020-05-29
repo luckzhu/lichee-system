@@ -281,7 +281,7 @@ export default {
           } else if (res.code === 202) {
             window.location.href = `http://gdmpxt.org/${res.data.info.forwardUrl}`
           } else {
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push({ path: '/' })
           }
           this.loading = false
         })
@@ -296,7 +296,7 @@ export default {
       if (this.timer) return
       this.$refs.loginForm.validateField('phone', valid => {
         if (!valid) {
-          getMsg({ account: this.loginForm.account }).then(res => {
+          getMsg({ account: this.loginForm.phone }).then(res => {
             if (res.code === 200) {
               this.$message({
                 type: 'success',
