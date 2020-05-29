@@ -44,7 +44,7 @@
 
       <!-- 品种根据上面的基地选择后动态变化 -->
       <template v-slot:bId="{ desc, data, field, formData }">
-        <el-select v-model="formData.bId">
+        <el-select v-model="formData.bId" placeholder="请先选择基地">
           <el-option
             v-for="option in breeds"
             :key="option.id"
@@ -157,18 +157,7 @@ export default {
           }
         }
       ],
-      tableData: [
-        {
-          baseId: 'xxxxxx基地01',
-          bId: 101,
-          num: 20,
-          saleDay: '20200512',
-          packing: 25,
-          weight: null,
-          batchNumber: null,
-          isCanceled: false
-        }
-      ],
+      tableData: [],
       formData: {},
       formDesc: {
         baseId: {
@@ -224,7 +213,6 @@ export default {
       })
     },
     handleSuccess(data) {
-      this.tableData.push(data)
       // 关闭弹窗
       this.dialogFormVisible = false
       // 重置formData
@@ -264,13 +252,14 @@ export default {
           type: 'warning'
         }
       )
-        .then(() => {
-          row.isCanceled = true
-
-          this.$message({
-            type: 'success',
-            message: '作废成功!'
-          })
+        .then(async() => {
+          const res = await cancelIdentification({ id: row.id })
+          if (res === 200) {
+            this.$message({
+              type: 'success',
+              message: '作废成功!'
+            })
+          }
         })
         .catch(() => {
           this.$message({

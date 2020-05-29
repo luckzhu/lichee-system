@@ -35,7 +35,7 @@
 
       <!-- 品种根据上面的基地选择后动态变化 -->
       <template v-slot:bId="{ desc, data, field, formData }">
-        <el-select v-model="formData.bId">
+        <el-select v-model="formData.bId" placeholder="请先选择基地">
           <el-option
             v-for="option in breeds"
             :key="option.id"
@@ -51,9 +51,13 @@
 <script>
 import { licheeBreedMap } from '@/utils/submit'
 import { queryBase, addContract, delContract, queryContract } from '@/api/base'
+import UploadFile from '@/components/UploadFile'
 
 export default {
   name: 'Contract',
+  components: {
+    UploadFile
+  },
   data() {
     return {
       // 控制是否显示
@@ -86,7 +90,34 @@ export default {
         },
         {
           label: '合同盖章件',
-          prop: 'contractFile '
+          prop: 'contractFile',
+          render: (h, scope) => {
+            if (scope.row.contractFile) {
+              const { url, name } = JSON.parse(scope.row.contractFile)
+              return (
+                <div>
+                  <a href={url} target='_blank'>
+                    {name}
+                  </a>
+                </div>
+              )
+            } else {
+              return (
+                <div>
+                  <UploadFile
+                    ref='upload'
+                    url='https://file.gdnjtg.cn/upload?projectName=gdlz'
+                    fileTypes='application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    fileSize={10}
+                    onGetFileList={file => this.handleFile(file, scope.row)}
+                    fileLimit={1}
+                  >
+                    上传合同
+                  </UploadFile>
+                </div>
+              )
+            }
+          }
         },
         {
           label: '操作',
@@ -112,7 +143,10 @@ export default {
         }
       ],
       tableData: [],
-      formData: {},
+      formData: {
+        contractFile: []
+      },
+      fileList: [],
       formDesc: {
         baseId: {
           label: '生产基地',
@@ -136,33 +170,9 @@ export default {
           type: 'input',
           label: '采购价格（元/公斤）',
           required: true
-        },
-        contract: {
-          type: 'upload-file',
-          label: '上传合同盖章件',
-          attrs: {
-            action: 'https://file.gdnjtg.cn/upload', // 上传地址
-            fileSize: 10, // 大小限制(MB)
-            withCredentials: true,
-            accept: 'application/pdf',
-            limit: 1,
-            multiple: false,
-            data: {
-              projectName: 'gdlz'
-            },
-            name: 'file',
-            handleResponse(response, file) {
-              console.log(response, file)
-              // 根据响应结果, 设置 URL
-              return {
-                name: 'w22222.pdf',
-                url: response.data.info,
-                size: file.size
-              }
-            }
-          }
         }
       },
+      editingContract: {},
       // 校检规则
       rules: {}
     }
@@ -193,14 +203,13 @@ export default {
     },
     handleSubmit(data) {
       return new Promise(async(resolve, reject) => {
-        const res = await addContract(data)
-        console.log(res)
+        await addContract(data)
         resolve(data)
       })
     },
 
     handleSuccess(data) {
-      this.tableData.push(data)
+      this.getContract()
       // 关闭弹窗
       this.dialogFormVisible = false
       // 重置formData
@@ -209,8 +218,10 @@ export default {
     },
     editContract(row) {
       this.formData = row
+      console.log(this.formData)
       this.dialogFormVisible = true
     },
+
     deleteContract(row) {
       this.$confirm(`是否确定删除此合同？`, '提示', {
         confirmButtonText: '确定',
@@ -224,6 +235,7 @@ export default {
               type: 'success',
               message: '删除成功!'
             })
+            this.getContract()
           } else {
             this.$message({
               type: 'danger',
@@ -237,6 +249,23 @@ export default {
             message: '已取消'
           })
         })
+    },
+    async handleFile(file, row) {
+      const { id } = row
+      let [contractFile] = file
+      contractFile = JSON.stringify(contractFile)
+      const res = await addContract({ id, contractFile })
+      if (res.code === 200) {
+        this.$message('上传成功')
+        this.getContract()
+      }
+    },
+    deleteFile(index) {
+      this.formData.contractFile.splice(index, 1)
+      this.$message({
+        type: 'success',
+        message: '删除成功'
+      })
     }
   }
 }
