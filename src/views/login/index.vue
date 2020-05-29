@@ -225,7 +225,7 @@ export default {
                 } else if (res.code === 202) {
                   window.location.href = `http://gdmpxt.org/${res.data.info.forwardUrl}`
                 } else {
-                  this.$router.push({ path: this.redirect || '/' })
+                  this.$router.push({ path: '/' })
                 }
               })
               .finally(() => {
