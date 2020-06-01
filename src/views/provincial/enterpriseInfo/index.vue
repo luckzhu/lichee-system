@@ -22,7 +22,9 @@
 </template>
 
 <script>
-import { queryUnit } from '@/api/user'
+import { queryUnit, validUnit } from '@/api/user'
+import { stateMap } from '@/utils/submit'
+
 export default {
   data() {
     return {
@@ -44,7 +46,12 @@ export default {
         {
           label: '企业名称',
           prop: 'unitName',
-          minWidth: '300px'
+          minWidth: '200px'
+        },
+        {
+          label: '统一社会信用代码',
+          prop: 'orgCode',
+          minWidth: '200px'
         },
         {
           label: '联系人',
@@ -52,23 +59,65 @@ export default {
         },
         {
           label: '手机',
-          prop: 'contactPhone'
+          prop: 'contactPhone',
+          minWidth: '100px'
+        },
+        {
+          prop: 'state',
+          label: '状态',
+          width: '100px',
+          render: (h, scope) => {
+            const { state } = scope.row
+            return (
+              <div>
+                <el-tag type={state ? stateMap[state].type : ''}>
+                  {state !== 0 && !state ? '无状态' : stateMap[state].label}
+                </el-tag>
+              </div>
+            )
+          }
+        },
+        {
+          label: '操作',
+          width: '220px',
+          render: (h, scope) => {
+            return (
+              <div className='button-group'>
+                <el-button
+                  type='primary'
+                  loading={scope.row === this.currentClick && this.loading}
+                  onClick={() => this.handleValidUnit(scope.row, 2)}
+                >
+                  审核通过
+                </el-button>
+                <el-button
+                  type='danger'
+                  loading={scope.row === this.currentClick && this.loading}
+                  onClick={() => this.handleValidUnit(scope.row, 3)}
+                >
+                  退回
+                </el-button>
+              </div>
+            )
+          }
         }
       ],
       tableData: [],
       currentPage: 1,
       pageSize: 10,
-      records: 20
+      records: 20,
+      loading: false,
+      currentClick: null
     }
   },
   mounted() {
-    this.getEnterprises({})
+    this.getEnterprises()
   },
   methods: {
     async getEnterprises({
       pageSize = this.pageSize,
       page = this.currentPage
-    }) {
+    } = {}) {
       const { rows: data, records } = await queryUnit({ pageSize, page })
       this.tableData = data
       this.records = records
@@ -76,10 +125,21 @@ export default {
     handleSizeChange(val) {
       this.currentPage = 1
       this.pageSize = val
-      this.getEnterprises({})
+      this.getEnterprises()
     },
     handleCurrentChange(val) {
       this.getEnterprises({ page: val })
+    },
+    async handleValidUnit(row, state) {
+      this.currentClick = row
+      this.loading = true
+      const { userId } = row
+      const res = await validUnit({ userId, state })
+      if (res.code === 200) {
+        this.$message(res.data.info)
+        this.getEnterprises()
+      }
+      this.loading = false
     }
   }
 }
