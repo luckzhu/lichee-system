@@ -21,8 +21,9 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
-// // 按钮级权限控制 v-permission="['admin']"
-// import permission from '@/directive/permission/index.js'
+// 按钮级权限控制 v-permission="['admin']"
+import permission from '@/directive/permission/index.js'
+Vue.directive('permission', permission)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

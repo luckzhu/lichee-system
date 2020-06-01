@@ -8,10 +8,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import permission from '@/directive/permission/index.js'
+
 export default {
   name: 'Dashboard',
-  directives: { permission },
   computed: {
     ...mapGetters(['name', 'roles'])
   }
