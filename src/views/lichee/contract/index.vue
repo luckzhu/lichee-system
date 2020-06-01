@@ -7,7 +7,16 @@
       </p>
     </div>
     <!-- 表格 -->
-    <lb-table ref="brandTable" :column="tableDesc" :data="tableData" border stripe align="center" />
+    <lb-table
+      ref="brandTable"
+      :column="tableDesc"
+      :data="tableData"
+      border
+      stripe
+      align="center"
+      show-summary
+      :summary-method="getSummaries"
+    />
     <!-- 表单 -->
     <ele-form-dialog
       v-model="formData"
@@ -44,6 +53,16 @@
           />
         </el-select>
       </template>
+
+      <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
+      <template v-for="item in numFields" v-slot:[item]="{ desc, data, field, formData }">
+        <el-input-number
+          :key="item"
+          v-model="formData[item]"
+          style="width:200px"
+          :controls="false"
+        />
+      </template>
     </ele-form-dialog>
   </div>
 </template>
@@ -56,19 +75,21 @@ import UploadFile from '@/components/UploadFile'
 export default {
   name: 'Contract',
   components: {
+    // eslint-disable-next-line
     UploadFile
   },
   data() {
     return {
       // 控制是否显示
       dialogFormVisible: false,
+      btnLoading: false,
       licheeBreedMap,
       bases: [],
       breeds: [],
       tableDesc: [
         {
           label: '生产基地',
-          prop: 'baseId'
+          prop: 'baseName'
         },
         {
           label: '品种',
@@ -121,16 +142,9 @@ export default {
         },
         {
           label: '操作',
-          width: '160px',
           render: (h, scope) => {
             return (
               <div className='button-group'>
-                <el-button
-                  type='primary'
-                  onClick={() => this.editContract(scope.row)}
-                >
-                  编辑
-                </el-button>
                 <el-button
                   type='danger'
                   onClick={() => this.deleteContract(scope.row)}
@@ -147,6 +161,7 @@ export default {
         contractFile: []
       },
       fileList: [],
+      numFields: ['weight', 'price'],
       formDesc: {
         baseId: {
           label: '生产基地',
@@ -162,12 +177,10 @@ export default {
           required: true
         },
         weight: {
-          type: 'input',
           label: '采购重量（吨）',
           required: true
         },
         price: {
-          type: 'input',
           label: '采购价格（元/公斤）',
           required: true
         }
@@ -187,6 +200,33 @@ export default {
       const { rows: data } = await queryContract()
       this.tableData = data
     },
+    // 表格 总重合计栏
+    getSummaries(param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (column.property === 'weight') {
+          const values = data.map(item => Number(item[column.property]))
+          if (!values.every(value => isNaN(value))) {
+            sums[index] = values.reduce((prev, curr) => {
+              const value = Number(curr)
+              if (!isNaN(value)) {
+                return prev + curr
+              } else {
+                return prev
+              }
+            }, 0)
+          }
+        } else {
+          sums[index] = ''
+        }
+      })
+      return sums
+    },
     onAddContract() {
       this.formData = {}
       this.dialogFormVisible = true
@@ -203,12 +243,15 @@ export default {
     },
     handleSubmit(data) {
       return new Promise(async(resolve, reject) => {
-        await addContract(data)
-        resolve(data)
+        try {
+          const res = await addContract(data)
+          resolve(res)
+        } catch (error) {
+          reject(new Error())
+        }
       })
     },
-
-    handleSuccess(data) {
+    handleSuccess(res) {
       this.getContract()
       // 关闭弹窗
       this.dialogFormVisible = false
