@@ -1,20 +1,19 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">企业名称: {{ name }}</div>
+    <div class="dashboard-text">欢迎您: {{ name }}</div>
+    <div v-permission="['no']" class="dashboard-text">该企业还未通过审核，若有疑问，请联系管理员~</div>
     <!-- <div class="dashboard-text">roles: <span v-for="role in roles" :key="role">{{ role }}</span></div> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
+import permission from '@/directive/permission/index.js'
 export default {
   name: 'Dashboard',
+  directives: { permission },
   computed: {
-    ...mapGetters([
-      'name',
-      'roles'
-    ])
+    ...mapGetters(['name', 'roles'])
   }
 }
 </script>
