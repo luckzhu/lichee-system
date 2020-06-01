@@ -109,7 +109,7 @@ export const asyncRoutes = [
       {
         path: 'subsidy',
         name: 'Subsidy',
-        hidden: true,
+        // hidden: true,
         component: () => import('@/views/lichee/subsidy'),
         meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye', 'shiji', 'wuliu'] }
       }

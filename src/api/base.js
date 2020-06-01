@@ -80,6 +80,14 @@ export function delContract(data) {
     data
   })
 }
+// 获取品牌标识 unitId 企业Id，没有就是获取自身
+export function queryIdentification(params) {
+  return request({
+    url: '/base/queryIdentification',
+    method: 'get',
+    params
+  })
+}
 // 新增品牌标识
 export function addIdentification(data) {
   return request({

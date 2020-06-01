@@ -23,6 +23,14 @@ export function queryUnit(params) {
     params
   })
 }
+// 审核企业信息 userId state
+export function validUnit(data) {
+  return request({
+    url: '/user/validUnit',
+    method: 'post',
+    data
+  })
+}
 
 // 获取单位类型,角色列表
 export function queryRoles(params) {
