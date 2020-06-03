@@ -130,6 +130,27 @@ export const asyncRoutes = [
       }
     ]
   },
+  {
+    path: '/logistics',
+    component: Layout,
+    redirect: '/logistics/license',
+    alwaysShow: true,
+    meta: { title: '物流补助', icon: 'subsidy', roles: ['wuliu'] },
+    children: [
+      {
+        path: 'license',
+        name: 'LogisticsLicense',
+        component: () => import('@/views/logistics/license'),
+        meta: { title: '物流资质', icon: 'info' }
+      },
+      {
+        path: 'lichee',
+        name: 'LogisticsLichee',
+        component: () => import('@/views/logistics/lichee'),
+        meta: { title: '广东荔枝', icon: 'info' }
+      }
+    ]
+  },
   // {
   //   path: 'external-link',
   //   component: Layout,
