@@ -12,13 +12,11 @@
 export default {
   name: 'Monitor',
   components: {
-    Add: () => import('./components/add'),
     Approved: () => import('./components/approved')
   },
   data() {
     return {
       tabs: [
-        { label: '新增物流补助', name: 'Add' },
         { label: '审核物流补助', name: 'Approved' }
       ]
     }

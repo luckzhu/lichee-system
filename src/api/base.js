@@ -104,3 +104,63 @@ export function cancelIdentification(data) {
     data
   })
 }
+// 查询物流信息登记列表(物流企业用)
+export function queryLogisticsInfoByLogUnit(params) {
+  return request({
+    url: '/base/queryLogisticsInfoByLogUnit',
+    method: 'get',
+    params
+  })
+}
+// 查询物流信息登记列表(物流企业用)
+export function addLogisticsInfo(data) {
+  return request({
+    url: '/base/addLogisticsInfo',
+    method: 'post',
+    data
+  })
+}
+
+// 填写物流资质登记表
+export function addLogisticsCred(data) {
+  return request({
+    url: '/base/addLogisticsCred',
+    method: 'post',
+    data
+  })
+}
+
+// 获取物流资质的信息
+export function getLogisticsCred(params) {
+  return request({
+    url: '/base/getLogisticsCred',
+    method: 'get',
+    params
+  })
+}
+
+// 查询物流信息登记列表(生产企业用)
+export function queryLogisticsInfoByProUnit(params) {
+  return request({
+    url: '/base/queryLogisticsInfoByProUnit',
+    method: 'get',
+    params
+  })
+}
+
+// 核准或取消物流补助 confirm 行为 0-取消核准 1-核准 id 物流信息ID
+export function confirmLogistics(data) {
+  return request({
+    url: '/base/confirmLogistics',
+    method: 'post',
+    data
+  })
+}
+// 给物流绑定批号 批号ID identificationId  物流ID logisticsId
+export function bindIdentificaionToLogis(data) {
+  return request({
+    url: '/base/bindIdentificaionToLogis',
+    method: 'post',
+    data
+  })
+}

@@ -1,22 +1,22 @@
 <template>
   <div class="brand-mark">
     <div style="margin-bottom: 20px">
-      <el-button type="primary" @click="onAddContract">登记物流资质</el-button>
+      <el-button type="primary" @click="onAddLicense">登记物流资质</el-button>
       <p class="standard">
         <span class="book">合同备案模板（点击下载）</span>。
       </p>
     </div>
     <!-- 表格 -->
-    <lb-table
+    <license-table :data="tableData" />
+    <!-- <lb-table
       ref="brandTable"
       :column="tableDesc"
       :data="tableData"
       border
       stripe
       align="center"
-      show-summary
-      :summary-method="getSummaries"
-    />
+    />-->
+
     <!-- 表单 -->
     <ele-form-dialog
       v-model="formData"
@@ -24,36 +24,27 @@
       :request-fn="handleSubmit"
       :rules="rules"
       :visible.sync="dialogFormVisible"
-      title="新增合同"
+      title="登记物流资质"
       label-position="left"
       :is-responsive="false"
       width="700px"
       @request-success="handleSuccess"
     >
-      <!-- select 存在初始校验的bug,所以改为slot -->
-      <template v-slot:baseId="{ desc, data, field, formData }">
-        <el-select v-model="formData.baseId" @change="changeBreed">
-          <el-option
-            v-for="option in bases"
-            :key="option.id"
-            :label="option.name"
-            :value="option.id"
-          />
-        </el-select>
+      <template v-slot:endTime="{ desc, data, field, formData }">
+        <el-date-picker v-model="formData.endTime" type="date" value-format="yyyy-MM-dd" />
       </template>
-
-      <!-- 品种根据上面的基地选择后动态变化 -->
-      <template v-slot:bId="{ desc, data, field, formData }">
-        <el-select v-model="formData.bId" placeholder="请先选择基地">
-          <el-option
-            v-for="option in breeds"
-            :key="option.id"
-            :label="licheeBreedMap.get(option.bId)"
-            :value="option.bId"
-          />
-        </el-select>
+      <template v-slot:businessFile="{ desc, data, field, formData }">
+        <UploadFile
+          url="https://file.gdnjtg.cn/upload?projectName=gdlz"
+          file-types="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          :file-size="10"
+          :file-limit="1"
+          @getFileList="handleFile"
+        >上传许可证</UploadFile>
+        <div>
+          <a :href="uploadedBusinessFile.url" target="blank">{{ uploadedBusinessFile.name }}</a>
+        </div>
       </template>
-
       <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
       <template v-for="item in numFields" v-slot:[item]="{ desc, data, field, formData }">
         <el-input-number
@@ -68,183 +59,84 @@
 </template>
 
 <script>
-import { licheeBreedMap } from '@/utils/submit'
-import { queryBase, addContract, delContract, queryContract } from '@/api/base'
+import { getLogisticsCred, addLogisticsCred } from '@/api/base'
 import UploadFile from '@/components/UploadFile'
+import LicenseTable from './licenseTable'
 
 export default {
   name: 'Contract',
   components: {
     // eslint-disable-next-line
-    UploadFile
+    UploadFile,
+    LicenseTable
   },
   data() {
     return {
       // 控制是否显示
       dialogFormVisible: false,
       btnLoading: false,
-      licheeBreedMap,
-      bases: [],
-      breeds: [],
-      tableDesc: [
-        {
-          label: '生产基地',
-          prop: 'baseName'
-        },
-        {
-          label: '品种',
-          prop: 'bId',
-          width: '80px',
-          formatter: row => licheeBreedMap.get(row.bId)
-        },
-        {
-          label: '采购对象',
-          prop: 'purchase'
-        },
-        {
-          label: '采购重量（吨）',
-          prop: 'weight'
-        },
-        {
-          label: '采购价格（元/公斤）',
-          prop: 'price'
-        },
-        {
-          label: '合同盖章件',
-          prop: 'contractFile',
-          render: (h, scope) => {
-            if (scope.row.contractFile) {
-              const { url, name } = JSON.parse(scope.row.contractFile)
-              return (
-                <div>
-                  <a href={url} target='_blank'>
-                    {name}
-                  </a>
-                </div>
-              )
-            } else {
-              return (
-                <div>
-                  <UploadFile
-                    ref='upload'
-                    url='https://file.gdnjtg.cn/upload?projectName=gdlz'
-                    fileTypes='application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    fileSize={10}
-                    onGetFileList={file => this.handleFile(file, scope.row)}
-                    fileLimit={1}
-                  >
-                    上传合同
-                  </UploadFile>
-                </div>
-              )
-            }
-          }
-        },
-        {
-          label: '操作',
-          render: (h, scope) => {
-            return (
-              <div className='button-group'>
-                <el-button
-                  type='danger'
-                  onClick={() => this.deleteContract(scope.row)}
-                >
-                  删除
-                </el-button>
-              </div>
-            )
-          }
-        }
-      ],
-      tableData: [],
-      formData: {
-        contractFile: []
-      },
+      tableData: {},
+      formData: {},
       fileList: [],
-      numFields: ['weight', 'price'],
+      numFields: ['coldCar', 'coldTransportWeight'],
       formDesc: {
-        baseId: {
-          label: '生产基地',
-          required: true
-        },
-        bId: {
-          label: '品种',
-          required: true
-        },
-        purchase: {
+        code: {
           type: 'input',
-          label: '采购对象',
+          label: '道路运输经营许可证编号',
           required: true
         },
-        weight: {
-          label: '采购重量（吨）',
+        endTime: {
+          label: '道路运输经营许可证有效期截止日',
           required: true
         },
-        price: {
-          label: '采购价格（元/公斤）',
+        haveTransport: {
+          type: 'radio',
+          label: '经营范围是否具有冷藏保鲜货物专用运输',
+          options: [
+            { text: '是', value: 1 },
+            { text: '否', value: 0 }
+          ],
+          required: true
+        },
+        coldCar: {
+          label: '冷链运输车数量（台）',
+          required: true
+        },
+        coldTransportWeight: {
+          label: '冷链运输年货运量（吨）',
+          required: true
+        },
+        businessFile: {
+          label: '上传道路运输经营许可证',
           required: true
         }
       },
-      editingContract: {},
       // 校检规则
-      rules: {}
+      rules: {},
+      uploadedBusinessFile: {}
     }
   },
 
   mounted() {
-    this.getContract()
-    this.getBaseAndBreed()
+    this.getLicense()
   },
   methods: {
-    async getContract() {
-      const { rows: data } = await queryContract()
-      this.tableData = data
+    async getLicense() {
+      const res = await getLogisticsCred()
+      this.tableData = res.data.info
     },
-    // 表格 总重合计栏
-    getSummaries(param) {
-      const { columns, data } = param
-      const sums = []
-      columns.forEach((column, index) => {
-        if (index === 0) {
-          sums[index] = '合计'
-          return
-        }
-        if (column.property === 'weight') {
-          const values = data.map(item => Number(item[column.property]))
-          if (!values.every(value => isNaN(value))) {
-            sums[index] = values.reduce((prev, curr) => {
-              const value = Number(curr)
-              if (!isNaN(value)) {
-                return prev + curr
-              } else {
-                return prev
-              }
-            }, 0)
-          }
-        } else {
-          sums[index] = ''
-        }
-      })
-      return sums
-    },
-    onAddContract() {
+    onAddLicense() {
       this.formData = {}
       this.dialogFormVisible = true
     },
-    async getBaseAndBreed() {
-      const { rows: bases } = await queryBase()
-      this.bases = bases
-    },
-    changeBreed(baseId) {
-      const { detail: breeds } = this.bases.filter(
-        item => item.id === baseId
-      )[0]
-      this.breeds = breeds
-    },
     handleSubmit(data) {
+      const { id } = this.tableData
+      if (id) {
+        data.id = id
+      }
       return new Promise(async(resolve, reject) => {
         try {
-          const res = await addContract(data)
+          const res = await addLogisticsCred(data)
           resolve(res)
         } catch (error) {
           reject(new Error())
@@ -252,63 +144,17 @@ export default {
       })
     },
     handleSuccess(res) {
-      this.getContract()
+      this.getLicense()
       // 关闭弹窗
       this.dialogFormVisible = false
       // 重置formData
       this.formData = {}
       this.$message.success('创建成功')
     },
-    editContract(row) {
-      this.formData = row
-      console.log(this.formData)
-      this.dialogFormVisible = true
-    },
-
-    deleteContract(row) {
-      this.$confirm(`是否确定删除此合同？`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async() => {
-          const res = await delContract({ id: row.id })
-          if (res.code === 200) {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
-            this.getContract()
-          } else {
-            this.$message({
-              type: 'danger',
-              message: '删除失败!'
-            })
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
-    },
-    async handleFile(file, row) {
-      const { id } = row
-      let [contractFile] = file
-      contractFile = JSON.stringify(contractFile)
-      const res = await addContract({ id, contractFile })
-      if (res.code === 200) {
-        this.$message('上传成功')
-        this.getContract()
-      }
-    },
-    deleteFile(index) {
-      this.formData.contractFile.splice(index, 1)
-      this.$message({
-        type: 'success',
-        message: '删除成功'
-      })
+    handleFile(file) {
+      const [businessFile] = file
+      this.uploadedBusinessFile = businessFile
+      this.formData.businessFile = JSON.stringify(businessFile)
     }
   }
 }

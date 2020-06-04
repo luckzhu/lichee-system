@@ -16,6 +16,7 @@ export function getInfo(params) {
   })
 }
 // 荔枝系统省级 440 abcd1234
+// 获取生产企业state=2 unitType=1
 export function queryUnit(params) {
   return request({
     url: 'user/queryUnit',
@@ -94,3 +95,4 @@ export function syncAccount(data) {
     data
   })
 }
+

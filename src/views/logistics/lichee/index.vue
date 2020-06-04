@@ -2,17 +2,14 @@
   <div class="brand-mark">
     <div style="margin-bottom: 20px">
       <el-button type="primary" @click="dialogFormVisible = true">新增物流补助</el-button>
+      <p class="describe">
+        <!-- <a href="@/assets/excel/logistics-excel-template.xlsx" download="物流信息登记表导入模板"> -->
+        <span class="download">下载导入模板</span>
+        <!-- </a> -->
+      </p>
     </div>
     <!-- 表格 -->
-    <lb-table
-      ref="brandTable"
-      :column="tableDesc"
-      :data="tableData"
-      border
-      stripe
-      align="center"
-      :cell-class-name="cellClass"
-    />
+    <lb-table ref="brandTable" :column="tableDesc" :data="tableData" border stripe align="center" />
     <!-- 表单 -->
     <ele-form-dialog
       v-model="formData"
@@ -23,31 +20,11 @@
       title="新增物流补助"
       label-position="left"
       :is-responsive="false"
-      width="550px"
+      width="700px"
       @request-success="handleSuccess"
     >
-      <!-- select 存在初始校验的bug,所以改为slot -->
-      <template v-slot:baseId="{ desc, data, field, formData }">
-        <el-select v-model="formData.baseId" @change="changeBreed">
-          <el-option
-            v-for="option in bases"
-            :key="option.id"
-            :label="option.name"
-            :value="option.id"
-          />
-        </el-select>
-      </template>
-
-      <!-- 品种根据上面的基地选择后动态变化 -->
-      <template v-slot:bId="{ desc, data, field, formData }">
-        <el-select v-model="formData.bId" placeholder="请先选择基地">
-          <el-option
-            v-for="option in breeds"
-            :key="option.id"
-            :label="licheeBreedMap.get(option.bId)"
-            :value="option.bId"
-          />
-        </el-select>
+      <template v-slot:selectExcel>
+        <upload-excel-component :on-success="handleUploadSuccess" :before-upload="beforeUpload" />
       </template>
 
       <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
@@ -60,13 +37,26 @@
         />
       </template>
 
-      <template v-slot:saleDate="{ desc, data, field, formData }">
-        <el-date-picker
-          v-model="formData.saleDate"
-          type="date"
-          placeholder="选择日期"
-          value-format="yyyy-MM-dd"
-        />
+      <template v-slot:sendTime="{ desc, data, field, formData }">
+        <el-date-picker v-model="formData.sendTime" type="date" value-format="yyyy-MM-dd" />
+      </template>
+      <template v-slot:landTime="{ desc, data, field, formData }">
+        <el-date-picker v-model="formData.landTime" type="date" value-format="yyyy-MM-dd" />
+      </template>
+
+      <!-- 存在初始校验的bug,所以改为slot -->
+      <template v-slot:regionCode="{ desc, data, field, formData }">
+        <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
+      </template>
+      <template v-slot:unitId="{ desc, data, field, formData }">
+        <el-select v-model="formData.unitId">
+          <el-option
+            v-for="option in units"
+            :key="option.id"
+            :label="option.unitName"
+            :value="option.id"
+          />
+        </el-select>
       </template>
     </ele-form-dialog>
   </div>
@@ -74,103 +64,179 @@
 
 <script>
 import { licheeBreedMap } from '@/utils/submit'
-import {
-  queryBase,
-  queryIdentification,
-  addIdentification,
-  cancelIdentification
-} from '@/api/base'
+import { queryRegion } from '@/api/normal'
+import { queryUnit } from '@/api/user'
+import { queryLogisticsInfoByLogUnit, addLogisticsInfo } from '@/api/base'
+import UploadExcelComponent from '@/components/UploadExcel/index.vue'
+import { parseTime } from '@/utils/index'
 
 export default {
   name: 'Subsidy',
+  components: {
+    UploadExcelComponent
+  },
   data() {
     return {
+      uploadData: [],
       // 控制是否显示
       dialogFormVisible: false,
       licheeBreedMap,
-      bases: [],
-      breeds: [],
+      units: [],
+      cascaderProps: {
+        lazy: true,
+        value: 'code',
+        label: 'name',
+        lazyLoad(node, resolve) {
+          const { level } = node
+          if (level === 0) {
+            queryRegion().then(res => {
+              const nodes = res.filter(item => item.type === 1)
+              resolve(nodes)
+            })
+          } else {
+            const { code } = node.data
+            queryRegion({ code }).then(res => {
+              const nodes = res
+                .filter(item => item.type === 2)
+                .map(item => ({
+                  code: item.code,
+                  name: item.name,
+                  leaf: true
+                }))
+              resolve(nodes)
+            })
+          }
+        }
+      },
       tableDesc: [
         {
-          label: '生产基地',
-          prop: ''
+          label: '地市',
+          prop: 'regionCode',
+          formatter(row) {
+            return row.cityName + row.countyName
+          }
         },
         {
-          label: '物流企业',
-          prop: ''
+          label: '生产企业',
+          prop: 'unitName',
+          minWidth: '200px'
         },
         {
           label: '承运数量（件）',
-          prop: ''
+          prop: 'num',
+          width: '120px'
         },
         {
           label: '重量规格（公斤/件）',
-          prop: ''
-        },
-        {
-          label: '承运总重（吨）',
-          prop: ''
+          prop: 'weight',
+          width: '140px'
         },
         {
           label: '发货日期',
-          prop: ''
+          prop: 'sendTime',
+          formatter: row => parseTime(row.sendTime, '{y}-{m}-{d}')
         },
         {
           label: '到达日期',
-          prop: ''
+          prop: 'landTime',
+          formatter: row => parseTime(row.landTime, '{y}-{m}-{d}')
         },
         {
           label: '收货信息',
           children: [
-            { label: '收货人', prop: '' },
-            { label: '联系电话', prop: '' },
-            { label: '收货地址', prop: '' }
+            { label: '收货人', prop: 'name', align: 'center' },
+            { label: '联系电话', prop: 'phone', align: 'center' },
+            {
+              label: '收货地址',
+              prop: 'address',
+              width: '240px',
+              align: 'center'
+            }
           ]
         }
       ],
       tableData: [],
       formData: {},
-      numFields: ['num', 'packing'],
+      numFields: ['num', 'weight'],
       formDesc: {
-        baseId: {
-          label: '生产基地',
+        isUpload: {
+          type: 'radio',
+          label: '填写方式',
+          default: 'handle',
+          options: [
+            { text: '手动填写', value: 'handle' },
+            { text: '导入excel', value: 'upload' }
+          ],
           required: true
         },
-        bId: {
-          label: '物流企业',
+        regionCode: {
+          label: '地市',
+          required: true,
+          valueFormatter(regionCode) {
+            return regionCode[regionCode.length - 1]
+          }
+        },
+        unitId: {
+          label: '生产企业',
           required: true
+        },
+        selectExcel: {
+          label: '选择excel',
+          vif(data) {
+            return data.isUpload === 'upload'
+          }
         },
         num: {
           label: '承运数量（件）',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        packing: {
+        weight: {
           label: '重量规格（公斤/件）',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        packing1: {
-          label: '承运总重（吨）',
-          required: true
-        },
-        saleDate: {
+        sendTime: {
           label: '发货日期',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        saleDate1: {
+        landTime: {
           label: '到达日期',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        saleDate2: {
+        name: {
+          type: 'input',
           label: '收货人',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        saleDate3: {
+        phone: {
+          type: 'input',
           label: '联系电话',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         },
-        saleDate4: {
+        address: {
+          type: 'input',
           label: '收货地址',
-          required: true
+          required: true,
+          vif(data) {
+            return data.isUpload === 'handle'
+          }
         }
       },
       // 校检规则
@@ -178,50 +244,57 @@ export default {
     }
   },
   mounted() {
-    this.getBaseAndBreed()
-    this.getIdentification()
+    this.getUnit()
+    this.getLogistics()
   },
   methods: {
-    async getBaseAndBreed() {
-      const { rows: bases } = await queryBase()
-      this.bases = bases
+    async getUnit() {
+      const { rows: units } = await queryUnit({ state: 2, unitType: 1 })
+      this.units = units
     },
-    async getIdentification() {
-      const { rows: data } = await queryIdentification()
+    async getLogistics() {
+      const { rows: data } = await queryLogisticsInfoByLogUnit()
       this.tableData = data
     },
-    changeBreed(baseId) {
-      const { detail: breeds } = this.bases.filter(
-        item => item.id === baseId
-      )[0]
-      this.breeds = breeds
-    },
     handleSubmit(data) {
-      data.weight = (data.num * data.packing) / 1000 // 计算总重
-      data.state = 0 // 初始状态为0，作废后为-1
-      // console.log(this.isExceedYield(data))
-
+      console.log(data)
+      let postData
+      if (data.isUpload === 'handle') {
+        delete data.isUpload
+        delete data.selectExcel
+        // 后台需要传递这样的data string 而不是正常的 JSON 对象
+        postData = JSON.stringify([data])
+      } else {
+        postData = JSON.stringify(this.generateCode(data, this.uploadData))
+      }
+      console.log(postData)
       return new Promise(async(resolve, reject) => {
-        if (this.isExceedYield(data)) {
-          this.$alert(
-            '该品种总重（数量*包装规格）大于该生产基地登记该品种的预计产量，请重新填写数量或包装规格!'
-          )
-          reject()
-        } else {
-          await addIdentification(data)
-          resolve(data)
-        }
+        await addLogisticsInfo({ data: postData })
+        resolve(data)
       })
     },
-    isExceedYield(data) {
-      const { baseId, bId, weight } = data
-      const breed = this.findBreed(baseId, bId)
-      return weight >= breed.yield / 1000
-    },
-    findBreed(baseId, bId) {
-      return this.bases
-        .find(base => base.id === baseId)
-        .detail.find(breed => breed.bId === bId)
+    // 当选择上次excel时，转换数据格式
+    generateCode(data, uploadData) {
+      const propsArr = [
+        'num',
+        'weight',
+        'sendTime',
+        'landTime',
+        'name',
+        'phone',
+        'address'
+      ]
+      const { regionCode, unitId } = data
+      const arr = []
+      uploadData.map((item, index) => {
+        const values = Object.values(item)
+        const obj = { regionCode, unitId }
+        values.forEach((ele, index) => {
+          Object.assign(obj, { [propsArr[index]]: ele })
+        })
+        arr.push(obj)
+      })
+      return arr
     },
     handleSuccess(data) {
       // 关闭弹窗
@@ -229,65 +302,40 @@ export default {
       // 重置formData
       this.formData = {}
       this.$message.success('创建成功')
-      this.getIdentification()
+      this.getLogistics()
     },
-    generateBatchNumber(row) {
-      const { id } = row
-      this.$confirm(`系统将自动生产批号，是否继续?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+    beforeUpload(file) {
+      const isLt1M = file.size / 1024 / 1024 < 1
+
+      if (isLt1M) {
+        return true
+      }
+
+      this.$message({
+        message: 'Please do not upload files larger than 1m in size.',
         type: 'warning'
       })
-        .then(async() => {
-          const res = await addIdentification({ id, state: 2 })
-          if (res.code === 200) {
-            this.$message({
-              type: 'success',
-              message: '生成成功!'
-            })
-            this.getIdentification()
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
+      return false
     },
-    cancelBatchNumber(row) {
-      this.$confirm(
-        `是否作废该批号 ${row.batchNumber}，作废后，该条记录和批号继续保留，是否继续?`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      )
-        .then(async() => {
-          const res = await cancelIdentification({ id: row.id })
-          if (res === 200) {
-            this.$message({
-              type: 'success',
-              message: '作废成功!'
-            })
-            this.getIdentification()
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
-    },
-    cellClass({ row, column, rowIndex, columnIndex }) {
-      if (row.state === -1) {
-        return 'canceled'
-      }
+    handleUploadSuccess({ results, header }) {
+      console.log(results, header)
+      this.uploadData = results
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.describe {
+  display: inline-block;
+  font-size: 14px;
+  vertical-align: top;
+  margin-left: 20px;
+  .download {
+    cursor: pointer;
+    color: #409eff;
+    text-decoration: underline;
+  }
+}
+</style>
 
