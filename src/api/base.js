@@ -156,11 +156,39 @@ export function confirmLogistics(data) {
     data
   })
 }
+
 // 给物流绑定批号 批号ID identificationId  物流ID logisticsId
 export function bindIdentificaionToLogis(data) {
   return request({
     url: '/base/bindIdentificaionToLogis',
     method: 'post',
     data
+  })
+}
+
+// 市级查看辖区物流补助
+export function queryLogisticsByRegion(params) {
+  return request({
+    url: '/base/queryLogisticsByRegion',
+    method: 'get',
+    params
+  })
+}
+
+// 市级查看基地登记的申领信息
+export function queryIdentificationByRegion(params) {
+  return request({
+    url: '/base/queryIdentificationByRegion',
+    method: 'get',
+    params
+  })
+}
+
+// 市级查看基地登记的合同信息
+export function queryContractByRegion(params) {
+  return request({
+    url: '/base/queryContractByRegion',
+    method: 'get',
+    params
   })
 }

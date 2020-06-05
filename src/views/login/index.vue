@@ -143,6 +143,7 @@ export default {
       syncDialogVisible: false,
       loginForm: {
         // 91441403707578965U  123456
+        // 4401 123
         // account: 'mtp6300138',
         // password: 'mtp6300138',
         account: '',

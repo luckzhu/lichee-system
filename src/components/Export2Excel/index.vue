@@ -2,7 +2,6 @@
   <span>
     <el-button
       :loading="downloadLoading"
-      style="margin-bottom:20px"
       type="primary"
       size="mini"
       icon="el-icon-document"

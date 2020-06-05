@@ -9,13 +9,9 @@
       align="center"
       :merge="['cityName','countyName']"
       pagination
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[5, 10, 20, 30]"
-      :pager-count="5"
       :current-page.sync="currentPage"
       :total="records"
       :page-size="pageSize"
-      @size-change="handleSizeChange"
       @p-current-change="handleCurrentChange"
     />
   </div>
@@ -121,11 +117,6 @@ export default {
       const { rows: data, records } = await queryUnit({ pageSize, page })
       this.tableData = data
       this.records = records
-    },
-    handleSizeChange(val) {
-      this.currentPage = 1
-      this.pageSize = val
-      this.getEnterprises()
     },
     handleCurrentChange(val) {
       this.getEnterprises({ page: val })

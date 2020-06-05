@@ -35,7 +35,14 @@ export default {
           {
             prop: 'name',
             label: '基地名称',
-            minWidth: '100px'
+            minWidth: '100px',
+            formatter: row => {
+              if (row.name) {
+                return row.name
+              } else {
+                return this.$store.getters.name
+              }
+            }
           },
           {
             prop: 'dataBegin',
@@ -45,12 +52,12 @@ export default {
           {
             prop: 'dataEnd',
             label: '结束日期',
-            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
+            formatter: row => parseTime(row.dataEnd, '{y}-{m}-{d}')
           },
           {
             prop: 'endTime',
             label: '截止日期',
-            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
+            formatter: row => parseTime(row.endTime, '{y}-{m}-{d}')
           },
           {
             prop: 'state',
@@ -129,7 +136,7 @@ export default {
             prop: 'endTime',
             label: '截止日期',
             width: '100px',
-            formatter: row => parseTime(row.dataBegin, '{y}-{m}-{d}')
+            formatter: row => parseTime(row.endTime, '{y}-{m}-{d}')
           }
         ],
         data: []

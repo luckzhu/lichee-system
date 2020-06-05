@@ -25,7 +25,15 @@
     <el-dialog title="核准物流补助" :visible.sync="dialogVisible" width="50%">
       <div class="operation">
         <section class="item">
-          <lb-table
+          <el-table
+            :data="selectedData"
+            border
+            highlight-current-row
+            style="width: 100%;margin-top:20px;"
+          >
+            <el-table-column v-for="item of selectedTableDesc" :key="item" :prop="item.prop" :label="item.label" min-width="item.minWidth" :formatter="item.formatter" />
+          </el-table>
+          <!-- <lb-table
             id="subsidy"
             ref="brandTable"
             :column="selectedTableDesc"
@@ -33,7 +41,7 @@
             border
             stripe
             align="center"
-          />
+          /> -->
           <div class="button-group">
             <el-button type="primary" @click="confirmLogistics(1)">核准以上物流补助</el-button>
             <el-button type="danger" @click="confirmLogistics(0)">取消核准以上物流补助</el-button>
@@ -90,12 +98,12 @@ export default {
         {
           label: '生产企业',
           prop: 'unitName',
-          minWidth: '160px'
+          minWidth: '200px'
         },
         {
           label: '物流企业',
           prop: 'logUnitName',
-          minWidth: '160px'
+          minWidth: '200px'
         },
         {
           label: '承运数量（件）',
@@ -142,13 +150,23 @@ export default {
         {
           label: '收货信息',
           children: [
-            { label: '收货人', prop: 'name', align: 'center' },
-            { label: '联系电话', prop: 'phone', align: 'center' },
+            {
+              label: '收货人',
+              prop: 'name',
+              align: 'center',
+              minWidth: '100px'
+            },
+            {
+              label: '联系电话',
+              prop: 'phone',
+              align: 'center',
+              minWidth: '100px'
+            },
             {
               label: '收货地址',
               prop: 'address',
               align: 'center',
-              minWidth: '160px'
+              minWidth: '200px'
             }
           ]
         },
@@ -359,9 +377,7 @@ export default {
           }
         } else if (column.property === 'confirm') {
           const values = data.map(item =>
-            item.confirm === 1
-              ? Number(item['totalWeight'])
-              : Number(0)
+            item.confirm === 1 ? Number(item['totalWeight']) : Number(0)
           )
           if (!values.every(value => isNaN(value))) {
             sums[index] = values.reduce((prev, curr) => {
@@ -399,17 +415,17 @@ export default {
 
 <style lang='scss'>
 // 放在一个类名下, 防止污染其他样式
-.subsidy-approved {
-  .el-table {
-    overflow: auto;
-  }
-  .el-table__body-wrapper,
-  .el-table__header-wrapper,
-  .el-table__footer-wrapper {
-    overflow: visible;
-  }
-  .el-table::after {
-    position: relative !important;
-  }
-}
+// .subsidy-approved {
+//   .el-table {
+//     overflow: auto;
+//   }
+//   .el-table__body-wrapper,
+//   .el-table__header-wrapper,
+//   .el-table__footer-wrapper {
+//     overflow: visible;
+//   }
+//   .el-table::after {
+//     position: relative !important;
+//   }
+// }
 </style>

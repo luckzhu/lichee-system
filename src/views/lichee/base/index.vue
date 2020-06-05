@@ -1,7 +1,22 @@
 <template>
   <div>
     <el-button v-if="roles.includes('nongye')" type="primary" class="add" @click="addBase">新增生产基地</el-button>
-    <lb-table :column="tableData.column" :data="tableData.data" border stripe align="center" />
+    <lb-table
+      :column="tableData.column"
+      :data="tableData.data"
+      border
+      stripe
+      align="center"
+      pagination
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[5, 10, 20, 30]"
+      :pager-count="5"
+      :current-page.sync="currentPage"
+      :total="records"
+      :page-size="pageSize"
+      @size-change="handleSizeChange"
+      @p-current-change="handleCurrentChange"
+    />
 
     <!-- 新增基地表单 -->
     <div class="addDailog">
@@ -166,21 +181,21 @@ export default {
               )
             }
           },
-          {
-            label: '操作',
-            render: (h, scope) => {
-              return (
-                <el-button
-                  type='info'
-                  onClick={() => {
-                    this.editForm(scope.row)
-                  }}
-                >
-                  {'编辑'}
-                </el-button>
-              )
-            }
-          },
+          // {
+          //   label: '操作',
+          //   render: (h, scope) => {
+          //     return (
+          //       <el-button
+          //         type='info'
+          //         onClick={() => {
+          //           this.editForm(scope.row)
+          //         }}
+          //       >
+          //         {'编辑'}
+          //       </el-button>
+          //     )
+          //   }
+          // },
           {
             label: '操作',
             width: '240px',
@@ -227,7 +242,10 @@ export default {
       baseId: -1,
       disabled: false,
       approved: false,
-      btnLoading: false
+      btnLoading: false,
+      currentPage: 1,
+      pageSize: 10,
+      records: 20
     }
   },
   computed: {
@@ -248,7 +266,7 @@ export default {
     }
   },
   mounted() {
-    this.getBaseList(this.roles)
+    this.getBaseList()
   },
   methods: {
     addBase() {
@@ -324,16 +342,31 @@ export default {
       })
       return temp
     },
-    getBaseList(roles) {
+    async getBaseList({
+      pageSize = this.pageSize,
+      page = this.currentPage,
+      roles = this.roles
+    } = {}) {
       if (roles.includes('shiji')) {
-        queryBaseByRegionCode().then(res => {
-          this.tableData.data = res.rows
+        const { rows: data, records } = await queryBaseByRegionCode({
+          pageSize,
+          page
         })
+        this.tableData.data = data
+        this.records = records
       } else {
-        queryBase().then(res => {
-          this.tableData.data = res.rows
-        })
+        const { rows: data, records } = await queryBase({ pageSize, page })
+        this.tableData.data = data
+        this.records = records
       }
+    },
+    handleSizeChange(val) {
+      this.currentPage = 1
+      this.pageSize = val
+      this.getBaseList()
+    },
+    handleCurrentChange(val) {
+      this.getBaseList({ page: val })
     },
     // 审核通过后创建基地账号
     createBaseAccount(row) {

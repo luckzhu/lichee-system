@@ -9,6 +9,7 @@
       :data="data"
       :span-method="this.merge ? this.mergeMethod : this.spanMethod"
       v-on="$listeners"
+      :height="height"
     >
       <lb-column v-for="(item, index) in column" :key="index" v-bind="$attrs" :column="item" />
     </el-table>
@@ -45,7 +46,7 @@ export default {
       type: String,
       default: 'right'
     },
-    merge: Array
+    merge: Array,
   },
   data() {
     return {
@@ -56,6 +57,9 @@ export default {
   computed: {
     dataLength() {
       return this.data.length
+    },
+    height(){
+      return document.body.clientHeight - 320
     }
   },
   watch: {

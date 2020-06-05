@@ -15,13 +15,13 @@
       </tr>
       <tr>
         <td colspan="2">经营范围是否具有冷藏保鲜货物专用运输</td>
-        <td colspan="2">{{ data.haveTransport }}</td>
+        <td colspan="2">{{ data.haveTransport === 1 ? '是' : '否' }}</td>
       </tr>
       <tr>
         <td>冷链运输车数量</td>
-        <td style="width:20%">{{ data.coldCar }}</td>
+        <td style="width:20%">{{ data.coldCar }}（台）</td>
         <td>冷链运输年货运量</td>
-        <td style="width:20%">{{ data.coldTransportWeight }}</td>
+        <td style="width:20%">{{ data.coldTransportWeight }}（吨）</td>
       </tr>
       <tr>
         <td colspan="2">上传道路运输经营许可证</td>

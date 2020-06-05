@@ -123,7 +123,7 @@ export default {
   methods: {
     async getLicense() {
       const res = await getLogisticsCred()
-      this.tableData = res.data.info
+      this.tableData = res.data.info ? res.data.info : {}
     },
     onAddLicense() {
       this.formData = {}
@@ -134,6 +134,7 @@ export default {
       if (id) {
         data.id = id
       }
+      console.log(data)
       return new Promise(async(resolve, reject) => {
         try {
           const res = await addLogisticsCred(data)
