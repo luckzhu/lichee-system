@@ -38,7 +38,11 @@ import { parseTime } from '@/utils/index'
 export default {
   filters: {
     parseTime(time) {
-      return parseTime(time, '{y}-{m}-{d}')
+      if (time) {
+        return parseTime(time, '{y}-{m}-{d}')
+      } else {
+        return ''
+      }
     }
   },
   props: {

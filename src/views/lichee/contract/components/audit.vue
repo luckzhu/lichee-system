@@ -139,12 +139,3 @@ export default {
   }
 }
 </style>
-
-<style lang="scss">
-.brand-mark {
-  .canceled {
-    color: rgb(180, 178, 178);
-    text-decoration: line-through;
-  }
-}
-</style>

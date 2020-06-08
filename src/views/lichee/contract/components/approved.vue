@@ -28,6 +28,7 @@
       label-position="left"
       :is-responsive="false"
       width="700px"
+      :dialog-attrs="{ 'close-on-click-modal': false }"
       @request-success="handleSuccess"
     >
       <!-- select 存在初始校验的bug,所以改为slot -->
@@ -331,15 +332,6 @@ export default {
   .button-group {
     display: flex;
     justify-content: center;
-  }
-}
-</style>
-
-<style lang="scss">
-.brand-mark {
-  .canceled {
-    color: rgb(180, 178, 178);
-    text-decoration: line-through;
   }
 }
 </style>

@@ -2,9 +2,6 @@
   <div class="brand-mark">
     <div style="margin-bottom: 20px">
       <el-button type="primary" @click="onAddLicense">登记物流资质</el-button>
-      <p class="standard">
-        <span class="book">合同备案模板（点击下载）</span>。
-      </p>
     </div>
     <!-- 表格 -->
     <license-table :data="tableData" />
@@ -28,10 +25,16 @@
       label-position="left"
       :is-responsive="false"
       width="700px"
+      :dialog-attrs="{ 'close-on-click-modal': false }"
       @request-success="handleSuccess"
     >
       <template v-slot:endTime="{ desc, data, field, formData }">
-        <el-date-picker v-model="formData.endTime" type="date" value-format="yyyy-MM-dd" />
+        <el-date-picker
+          v-model="formData.endTime"
+          type="date"
+          value-format="yyyy-MM-dd"
+          :picker-options="pickerOptions"
+        />
       </template>
       <template v-slot:businessFile="{ desc, data, field, formData }">
         <UploadFile
@@ -71,6 +74,13 @@ export default {
     LicenseTable
   },
   data() {
+    const isUpload = (rule, value, callback) => {
+      if (!this.formData.businessFile) {
+        callback(new Error('请上传道路运输经营许可证'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 控制是否显示
       dialogFormVisible: false,
@@ -107,13 +117,20 @@ export default {
           required: true
         },
         businessFile: {
-          label: '上传道路运输经营许可证',
-          required: true
+          label: '上传道路运输经营许可证'
         }
       },
       // 校检规则
-      rules: {},
-      uploadedBusinessFile: {}
+      rules: {
+        businessFile: [{ validator: isUpload }]
+      },
+      uploadedBusinessFile: {},
+      pickerOptions: {
+        // 限制时间不让选择今天之后的
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 24 * 60 * 60 * 1000
+        }
+      }
     }
   },
 

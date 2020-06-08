@@ -4,7 +4,13 @@
       <el-button type="primary" @click="dialogFormVisible = true">新增品牌标识申领</el-button>
       <p class="standard">
         申领品牌标识的产品必须符合
-        <span class="book">《“广东荔枝”区域公用品牌产品供应标准》（点击下载）</span>。
+        <a
+          href="http://file.gdnjtg.cn/gdlz/“广东荔枝”区域公用品牌产品供应标准(4.20).pdf"
+          download="“广东荔枝”区域公用品牌产品供应标准(4.20).pdf "
+          target="blank"
+        >
+          <span class="book">《“广东荔枝”区域公用品牌产品供应标准》（点击下载）</span>
+        </a>。
       </p>
     </div>
     <!-- 表格 -->
@@ -28,6 +34,7 @@
       label-position="left"
       :is-responsive="false"
       width="550px"
+      :dialog-attrs="{ 'close-on-click-modal': false }"
       @request-success="handleSuccess"
     >
       <!-- select 存在初始校验的bug,所以改为slot -->
@@ -165,7 +172,7 @@ export default {
               <div className='button-group'>
                 <el-button
                   type='primary'
-                  disabled={!!scope.row.batchNumber}
+                  disabled={!!scope.row.batchNumber || scope.row.state === -1}
                   onClick={() => this.generateBatchNumber(scope.row)}
                 >
                   确定
@@ -305,7 +312,7 @@ export default {
       )
         .then(async() => {
           const res = await cancelIdentification({ id: row.id })
-          if (res === 200) {
+          if (res.code === 200) {
             this.$message({
               type: 'success',
               message: '作废成功!'

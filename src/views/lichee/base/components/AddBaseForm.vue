@@ -104,11 +104,13 @@ export default {
           } else {
             const { code } = node.data
             queryRegion({ code }).then(res => {
-              const nodes = res.filter(item => item.type === 2).map(item => ({
-                code: item.code,
-                name: item.name,
-                leaf: true
-              }))
+              const nodes = res
+                .filter(item => item.type === 2)
+                .map(item => ({
+                  code: item.code,
+                  name: item.name,
+                  leaf: true
+                }))
               resolve(nodes)
             })
           }

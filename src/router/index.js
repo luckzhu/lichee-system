@@ -103,7 +103,7 @@ export const asyncRoutes = [
         path: 'weeklyForm',
         name: 'WeeklyForm',
         hidden: true,
-        component: () => import('@/views/lichee/monitor/reportsWeekly/form'),
+        component: () => import('@/views/lichee/monitor/components/reportsWeekly/form'),
         meta: { title: '周报', activeMenu: '/lichee/monitor' }
       },
       {

@@ -224,7 +224,7 @@ export default {
     },
     disabled() {
       const { state } = this.issue
-      if (state === -1 || state === 0) {
+      if (state === -1 || state === 0 || state === 3) {
         return false
       } else {
         return true

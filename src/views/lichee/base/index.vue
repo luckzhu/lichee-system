@@ -27,6 +27,7 @@
         :width="dialogWidth"
         top="10vh"
         center
+        :destroy-on-close="true"
       >
         <add-base-form
           ref="addBaseForm"
@@ -273,6 +274,7 @@ export default {
       this.disabled = false
       this.formData = {}
       this.baseId = -1
+      console.log(this.$refs.addBaseForm)
       this.dialogFormVisible = true
     },
     approve() {

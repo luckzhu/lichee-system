@@ -12,12 +12,13 @@
       border
       stripe
       align="center"
-      pagination
+    />
+    <!-- 分页 -->
+    <!-- pagination
       :current-page.sync="currentPage"
       :total="records"
       :page-size="pageSize"
-      @p-current-change="handleCurrentChange"
-    />
+      @p-current-change="handleCurrentChange" -->
   </div>
 </template>
 

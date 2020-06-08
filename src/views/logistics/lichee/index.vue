@@ -3,9 +3,10 @@
     <div style="margin-bottom: 20px">
       <el-button type="primary" @click="dialogFormVisible = true">新增物流补助</el-button>
       <p class="describe">
-        <!-- <a href="@/assets/excel/logistics-excel-template.xlsx" download="物流信息登记表导入模板"> -->
-        <span class="download">下载导入模板</span>
-        <!-- </a> -->
+        <a href="http://file.gdnjtg.cn/gdlz/物流信息登记表导入模板.xlsx" download="物流信息登记表导入模板.xlsx">
+          <span class="download">下载导入模板</span>
+        </a>
+        （提示：时间格式为：2020-06-01）
       </p>
     </div>
     <!-- 表格 -->
@@ -21,6 +22,7 @@
       label-position="left"
       :is-responsive="false"
       width="700px"
+      :dialog-attrs="{ 'close-on-click-modal': false }"
       @request-success="handleSuccess"
     >
       <template v-slot:selectExcel>
@@ -318,7 +320,7 @@ export default {
       return false
     },
     handleUploadSuccess({ results, header }) {
-      console.log(results, header)
+      this.$message('数据已导入，待提交后生效')
       this.uploadData = results
     }
   }

@@ -22,7 +22,12 @@
       @selection-change="handleSelectionChange"
     />
 
-    <el-dialog title="核准物流补助" :visible.sync="dialogVisible" width="50%">
+    <el-dialog
+      title="核准物流补助"
+      :visible.sync="dialogVisible"
+      width="50%"
+      :close-on-click-modal="false"
+    >
       <div class="operation">
         <section class="item">
           <el-table
@@ -31,7 +36,14 @@
             highlight-current-row
             style="width: 100%;margin-top:20px;"
           >
-            <el-table-column v-for="item of selectedTableDesc" :key="item" :prop="item.prop" :label="item.label" min-width="item.minWidth" :formatter="item.formatter" />
+            <el-table-column
+              v-for="item of selectedTableDesc"
+              :key="item.prop"
+              :prop="item.prop"
+              :label="item.label"
+              min-width="item.minWidth"
+              :formatter="item.formatter"
+            />
           </el-table>
           <!-- <lb-table
             id="subsidy"
@@ -41,7 +53,7 @@
             border
             stripe
             align="center"
-          /> -->
+          />-->
           <div class="button-group">
             <el-button type="primary" @click="confirmLogistics(1)">核准以上物流补助</el-button>
             <el-button type="danger" @click="confirmLogistics(0)">取消核准以上物流补助</el-button>
@@ -260,19 +272,19 @@ export default {
           minWidth: '100px',
           formatter: row => parseTime(row.landTime, '{y}-{m}-{d}')
         },
+        // {
+        //   label: '收货信息',
+        //   children: [
+        { label: '收货人', prop: 'name', align: 'center' },
+        { label: '联系电话', prop: 'phone', align: 'center' },
         {
-          label: '收货信息',
-          children: [
-            { label: '收货人', prop: 'name', align: 'center' },
-            { label: '联系电话', prop: 'phone', align: 'center' },
-            {
-              label: '收货地址',
-              prop: 'address',
-              align: 'center',
-              minWidth: '160px'
-            }
-          ]
+          label: '收货地址',
+          prop: 'address',
+          align: 'center',
+          minWidth: '160px'
         }
+        // ]
+        // }
       ],
       tableData: [],
       identification: [],
@@ -366,7 +378,7 @@ export default {
         if (needSummary.includes(column.property)) {
           const values = data.map(item => Number(item[column.property]))
           if (!values.every(value => isNaN(value))) {
-            sums[index] = values.reduce((prev, curr) => {
+            let result = values.reduce((prev, curr) => {
               const value = Number(curr)
               if (!isNaN(value)) {
                 return prev + curr
@@ -374,20 +386,26 @@ export default {
                 return prev
               }
             }, 0)
+            if (result.toString().indexOf('.') > -1) {
+              result = result.toFixed(3)
+            }
+            sums[index] = result
           }
         } else if (column.property === 'confirm') {
           const values = data.map(item =>
             item.confirm === 1 ? Number(item['totalWeight']) : Number(0)
           )
           if (!values.every(value => isNaN(value))) {
-            sums[index] = values.reduce((prev, curr) => {
-              const value = Number(curr)
-              if (!isNaN(value)) {
-                return prev + curr
-              } else {
-                return prev
-              }
-            }, 0)
+            sums[index] = values
+              .reduce((prev, curr) => {
+                const value = Number(curr)
+                if (!isNaN(value)) {
+                  return prev + curr
+                } else {
+                  return prev
+                }
+              }, 0)
+              .toFixed(3)
           }
         } else {
           sums[index] = ''
