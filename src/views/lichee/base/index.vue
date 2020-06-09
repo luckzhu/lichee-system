@@ -1,20 +1,29 @@
 <template>
   <div>
+    <div class="filter-wrapper">
+      <div class="filter">
+        <el-select v-model="state" placeholder="状态筛选">
+          <el-option label="所有状态" :value="100" />
+          <el-option
+            v-for="(item,key) in stateMap"
+            :key="key"
+            :label="item.label"
+            :value="Number(key)"
+          />
+        </el-select>
+      </div>
+    </div>
     <el-button v-if="roles.includes('nongye')" type="primary" class="add" @click="addBase">新增生产基地</el-button>
     <lb-table
       :column="tableData.column"
-      :data="tableData.data"
+      :data="mytableData.slice( (currentPage - 1) * pageSize, currentPage * pageSize )"
       border
       stripe
       align="center"
       pagination
-      layout="total, sizes, prev, pager, next, jumper"
-      :page-sizes="[5, 10, 20, 30]"
-      :pager-count="5"
       :current-page.sync="currentPage"
-      :total="records"
+      :total="total"
       :page-size="pageSize"
-      @size-change="handleSizeChange"
       @p-current-change="handleCurrentChange"
     />
 
@@ -72,6 +81,17 @@ export default {
       formData: {},
       tableData: {
         column: [
+          {
+            label: '序号',
+            type: 'index',
+            render: (h, scope) => {
+              return (
+                <div>
+                  {scope.$index + 1 + (this.currentPage - 1) * this.pageSize}
+                </div>
+              )
+            }
+          },
           {
             prop: 'name',
             label: '企业字号',
@@ -246,7 +266,8 @@ export default {
       btnLoading: false,
       currentPage: 1,
       pageSize: 10,
-      records: 20
+      state: 100,
+      stateMap
     }
   },
   computed: {
@@ -264,6 +285,17 @@ export default {
       } else {
         return '95%'
       }
+    },
+    mytableData() {
+      const { state } = this
+      let tableData = this.tableData.data
+      if (state !== 100) {
+        tableData = tableData.filter(item => item.state === state)
+      }
+      return tableData
+    },
+    total() {
+      return this.mytableData.length
     }
   },
   mounted() {
@@ -344,31 +376,19 @@ export default {
       })
       return temp
     },
-    async getBaseList({
-      pageSize = this.pageSize,
-      page = this.currentPage,
-      roles = this.roles
-    } = {}) {
+    async getBaseList(roles = this.roles) {
       if (roles.includes('shiji')) {
-        const { rows: data, records } = await queryBaseByRegionCode({
-          pageSize,
-          page
+        const { rows: data } = await queryBaseByRegionCode({
+          pageSize: 100000 // 改为前端分页
         })
         this.tableData.data = data
-        this.records = records
       } else {
-        const { rows: data, records } = await queryBase({ pageSize, page })
+        const { rows: data } = await queryBase({ pageSize: 100000 })
         this.tableData.data = data
-        this.records = records
       }
     },
-    handleSizeChange(val) {
-      this.currentPage = 1
-      this.pageSize = val
-      this.getBaseList()
-    },
-    handleCurrentChange(val) {
-      this.getBaseList({ page: val })
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage
     },
     // 审核通过后创建基地账号
     createBaseAccount(row) {
@@ -400,6 +420,9 @@ export default {
 }
 .title-icon {
   display: flex;
+}
+.filter-wrapper{
+  margin-bottom: 20px;
 }
 </style>
 
