@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="filter-wrapper">
+    <div v-if="roles.includes('shiji')" class="filter-wrapper">
       <div class="filter">
         <el-select v-model="state" placeholder="状态筛选">
           <el-option label="所有状态" :value="100" />
