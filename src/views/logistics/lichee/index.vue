@@ -51,7 +51,7 @@
         <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
       </template>
       <template v-slot:unitId="{ desc, data, field, formData }">
-        <el-select v-model="formData.unitId">
+        <el-select v-model="formData.unitId" filterable>
           <el-option
             v-for="option in units"
             :key="option.id"
@@ -251,7 +251,11 @@ export default {
   },
   methods: {
     async getUnit() {
-      const { rows: units } = await queryUnit({ state: 2, unitType: 1 })
+      const { rows: units } = await queryUnit({
+        state: 2,
+        unitType: 1,
+        pageSize: 10000
+      })
       this.units = units
     },
     async getLogistics() {
