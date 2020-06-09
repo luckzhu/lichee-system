@@ -1,16 +1,39 @@
 <template>
   <div>
+    <div class="filter-wrapper">
+      <div class="filter">
+        <el-select v-model="state" placeholder="状态筛选">
+          <el-option
+            v-for="item in stateOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
+      <div class="filter">
+        <el-autocomplete
+          v-model="searchUnitName"
+          style="width:260px"
+          :fetch-suggestions="querySearch"
+          placeholder="请输入企业名称或统一社会信用代码"
+          :trigger-on-focus="false"
+          value-key="unitName"
+          @select="handleSelect"
+        />
+      </div>
+    </div>
     <lb-table
       ref="brandTable"
       :column="tableDesc"
-      :data="tableData"
+      :data="mytableData.slice( (currentPage - 1) * pageSize, currentPage * pageSize )"
       border
       stripe
       align="center"
       :merge="['cityName','countyName']"
       pagination
       :current-page.sync="currentPage"
-      :total="records"
+      :total="total"
       :page-size="pageSize"
       @p-current-change="handleCurrentChange"
     />
@@ -24,10 +47,18 @@ import { stateMap } from '@/utils/submit'
 export default {
   data() {
     return {
+      stateMap,
       tableDesc: [
         {
           label: '序号',
-          type: 'index'
+          type: 'index',
+          render: (h, scope) => {
+            return (
+              <div>
+                {scope.$index + 1 + (this.currentPage - 1) * this.pageSize}
+              </div>
+            )
+          }
         },
         {
           label: '市',
@@ -101,25 +132,48 @@ export default {
       tableData: [],
       currentPage: 1,
       pageSize: 10,
-      records: 20,
       loading: false,
-      currentClick: null
+      currentClick: null,
+      state: 0,
+      stateOptions: [
+        { value: 100, label: '所有状态' },
+        { value: 0, label: '已保存' },
+        { value: 2, label: '审核通过' },
+        { value: 3, label: '退回待修改' }
+      ],
+      searchUnitName: null
+    }
+  },
+  computed: {
+    mytableData() {
+      const { state, searchUnitName } = this
+      let tableData = this.tableData
+      if (state !== 100) {
+        tableData = tableData.filter(item => item.state === state)
+      }
+      if (searchUnitName) {
+        return tableData.filter(
+          item =>
+            item.unitName.indexOf(searchUnitName) !== -1 ||
+            item.orgCode.indexOf(searchUnitName) !== -1
+        )
+      }
+      return tableData
+    },
+    total() {
+      return this.mytableData.length
     }
   },
   mounted() {
     this.getEnterprises()
   },
   methods: {
-    async getEnterprises({
-      pageSize = this.pageSize,
-      page = this.currentPage
-    } = {}) {
-      const { rows: data, records } = await queryUnit({ pageSize, page })
+    async getEnterprises() {
+      const { rows: data } = await queryUnit({ pageSize: 100000 })
       this.tableData = data
-      this.records = records
     },
-    handleCurrentChange(val) {
-      this.getEnterprises({ page: val })
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage
     },
     async handleValidUnit(row, state) {
       this.currentClick = row
@@ -131,10 +185,40 @@ export default {
         this.getEnterprises()
       }
       this.loading = false
+    },
+    querySearch(queryString, cb) {
+      const tableData = this.mytableData
+      const results = queryString
+        ? tableData.filter(this.createFilter(queryString))
+        : tableData
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+      console.log(results)
+    },
+    createFilter(queryString) {
+      return item => {
+        return (
+          item.unitName.toLowerCase().indexOf(queryString.toLowerCase()) !==
+            -1 ||
+          item.orgCode.toLowerCase().indexOf(queryString.toLowerCase()) !== -1
+        )
+      }
+    },
+    handleSelect(item) {
+      console.log(item)
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.filter-wrapper {
+  margin-bottom: 20px;
+  display: flex;
+  .filter {
+    &:not(:first-child) {
+      margin-left: 10px;
+    }
+  }
+}
 </style>
