@@ -1,5 +1,5 @@
 <template>
-  <div class="brand-mark">
+  <div class="contract">
     <div style="margin-bottom: 20px">
       <el-button type="primary" @click="onAddContract">新增合同</el-button>
       <p class="standard">
@@ -64,6 +64,19 @@
           :controls="false"
         />
       </template>
+
+      <template v-slot:contractFile>
+        <UploadFile
+          url="https://file.gdnjtg.cn/upload?projectName=gdlz"
+          file-types="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          :file-size="10"
+          :file-limit="1"
+          @getFileList="handleFile"
+        >上传许可证</UploadFile>
+        <div>
+          <a :href="uploadedContractFile.url" target="blank">{{ uploadedContractFile.name }}</a>
+        </div>
+      </template>
     </ele-form-dialog>
   </div>
 </template>
@@ -80,6 +93,13 @@ export default {
     UploadFile
   },
   data() {
+    const isUpload = (rule, value, callback) => {
+      if (!this.formData.contractFile) {
+        callback(new Error('请上传合同盖章件'))
+      } else {
+        callback()
+      }
+    }
     return {
       // 控制是否显示
       dialogFormVisible: false,
@@ -123,21 +143,6 @@ export default {
                   </a>
                 </div>
               )
-            } else {
-              return (
-                <div>
-                  <UploadFile
-                    ref='upload'
-                    url='https://file.gdnjtg.cn/upload?projectName=gdlz'
-                    fileTypes='application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    fileSize={10}
-                    onGetFileList={file => this.handleFile(file, scope.row)}
-                    fileLimit={1}
-                  >
-                    上传合同
-                  </UploadFile>
-                </div>
-              )
             }
           }
         },
@@ -158,9 +163,8 @@ export default {
         }
       ],
       tableData: [],
-      formData: {
-        contractFile: []
-      },
+      formData: {},
+      uploadedContractFile: {},
       fileList: [],
       numFields: ['weight', 'price'],
       formDesc: {
@@ -184,11 +188,16 @@ export default {
         price: {
           label: '采购价格（元/公斤）',
           required: true
+        },
+        contractFile: {
+          label: '上传合同盖章件'
         }
       },
       editingContract: {},
       // 校检规则
-      rules: {}
+      rules: {
+        contractFile: [{ validator: isUpload }]
+      }
     }
   },
 
@@ -213,7 +222,7 @@ export default {
         if (column.property === 'weight') {
           const values = data.map(item => Number(item[column.property]))
           if (!values.every(value => isNaN(value))) {
-            sums[index] = values.reduce((prev, curr) => {
+            let result = values.reduce((prev, curr) => {
               const value = Number(curr)
               if (!isNaN(value)) {
                 return prev + curr
@@ -221,6 +230,10 @@ export default {
                 return prev
               }
             }, 0)
+            if (result.toString().indexOf('.') > -1) {
+              result = result.toFixed(4)
+            }
+            sums[index] = result
           }
         } else {
           sums[index] = ''
@@ -230,6 +243,7 @@ export default {
     },
     onAddContract() {
       this.formData = {}
+      this.uploadedContractFile = {}
       this.dialogFormVisible = true
     },
     async getBaseAndBreed() {
@@ -294,15 +308,10 @@ export default {
           })
         })
     },
-    async handleFile(file, row) {
-      const { id } = row
-      let [contractFile] = file
-      contractFile = JSON.stringify(contractFile)
-      const res = await addContract({ id, contractFile })
-      if (res.code === 200) {
-        this.$message('上传成功')
-        this.getContract()
-      }
+    handleFile(file, row) {
+      const [contractFile] = file
+      this.uploadedContractFile = contractFile
+      this.formData.contractFile = JSON.stringify(contractFile)
     },
     deleteFile(index) {
       this.formData.contractFile.splice(index, 1)
@@ -316,7 +325,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.brand-mark {
+.contract {
   .standard {
     display: inline-block;
     font-size: 14px;

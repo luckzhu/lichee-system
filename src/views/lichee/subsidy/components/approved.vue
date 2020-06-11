@@ -2,18 +2,28 @@
   <div class="subsidy-approved">
     <div style="margin-bottom: 20px">
       <el-button type="primary" size="mini" @click="openDialog">核准所选物流</el-button>
+
+      <el-select v-model="state" style="margin-left:20px" placeholder="状态筛选">
+        <el-option
+          v-for="item in stateOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
       <export-excel
         table-id="subsidy"
         file-name="物流补助核准汇总表"
         :filter-arr="['selection','handle']"
       >导出汇总表</export-excel>
+      <span class="describe">提示：核准物流前，请先绑定批号</span>
     </div>
     <!-- 表格 -->
     <lb-table
       id="subsidy"
       ref="brandTable"
       :column="tableDesc"
-      :data="tableData"
+      :data="myTableData"
       border
       stripe
       align="center"
@@ -101,7 +111,10 @@ export default {
       tableDesc: [
         {
           type: 'selection',
-          className: 'selection'
+          className: 'selection',
+          selectable: row => {
+            return row.batchNumber
+          }
         },
         {
           label: '序号',
@@ -293,12 +306,32 @@ export default {
       batchNumberDialogVisible: false,
       // 选择的是batchNumber，但是需要传递identificationId
       identificationId: null,
-      editingLogistics: {}
+      editingLogistics: {},
+      stateOptions: [
+        { value: 100, label: '所有补助' },
+        { value: 0, label: '未核准' },
+        { value: 1, label: '已核准' }
+      ],
+      state: 100
     }
   },
   computed: {
     selectedData() {
       return this.tableData.filter(item => this.selectedIds.includes(item.id))
+    },
+    myTableData() {
+      const { state } = this
+      let tableData = this.tableData
+      // 其实应该是判断不等于100，但由于confirm不给初始状态
+      // 所以需要单独判断
+      if (state === 1) {
+        tableData = tableData.filter(item => item.confirm === state)
+      } else if (state === 0) {
+        tableData = tableData.filter(
+          item => item.confirm === state || !item.confirm
+        )
+      }
+      return tableData
     }
   },
   mounted() {
@@ -307,9 +340,15 @@ export default {
   },
   methods: {
     async getLogistics() {
-      const { rows: data } = await queryLogisticsInfoByProUnit()
+      const { rows: data } = await queryLogisticsInfoByProUnit({
+        pageSize: 100000
+      })
       data.map(item => {
-        this.$set(item, 'totalWeight', (item.num * item.weight) / 1000)
+        let result = (item.num * item.weight) / 1000
+        if (result.toString().indexOf('.') > -1) {
+          result = result.toFixed(4)
+        }
+        this.$set(item, 'totalWeight', result)
       })
       this.tableData = data
     },
@@ -317,7 +356,6 @@ export default {
       // state=2，只找确定过的批号
       const { rows: data } = await queryIdentification({ state: 2 })
       this.identification = data
-      console.log(this.identification)
     },
     openDialog() {
       const { selectedIds } = this
@@ -363,7 +401,6 @@ export default {
         }
       })
       this.selectedIds = arr
-      console.log(this.selectedIds)
     },
     // 表格 合计栏
     getSummaries(param) {
@@ -387,7 +424,7 @@ export default {
               }
             }, 0)
             if (result.toString().indexOf('.') > -1) {
-              result = result.toFixed(3)
+              result = result.toFixed(4)
             }
             sums[index] = result
           }
@@ -405,7 +442,7 @@ export default {
                   return prev
                 }
               }, 0)
-              .toFixed(3)
+              .toFixed(4)
           }
         } else {
           sums[index] = ''
@@ -418,6 +455,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.describe {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 20px;
+}
 .operation {
   .item {
     margin: 0 0 30px 10px;
@@ -429,21 +471,4 @@ export default {
     }
   }
 }
-</style>
-
-<style lang='scss'>
-// 放在一个类名下, 防止污染其他样式
-// .subsidy-approved {
-//   .el-table {
-//     overflow: auto;
-//   }
-//   .el-table__body-wrapper,
-//   .el-table__header-wrapper,
-//   .el-table__footer-wrapper {
-//     overflow: visible;
-//   }
-//   .el-table::after {
-//     position: relative !important;
-//   }
-// }
 </style>

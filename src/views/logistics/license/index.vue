@@ -36,7 +36,7 @@
           :picker-options="pickerOptions"
         />
       </template>
-      <template v-slot:businessFile="{ desc, data, field, formData }">
+      <template v-slot:businessFile>
         <UploadFile
           url="https://file.gdnjtg.cn/upload?projectName=gdlz"
           file-types="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -144,6 +144,7 @@ export default {
     },
     onAddLicense() {
       this.formData = {}
+      this.uploadedBusinessFile = {}
       this.dialogFormVisible = true
     },
     handleSubmit(data) {

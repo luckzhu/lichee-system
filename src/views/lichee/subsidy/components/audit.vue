@@ -1,6 +1,14 @@
 <template>
   <div class="subsidy-approved">
     <div style="margin-bottom: 20px">
+      <!-- <el-select v-model="state" style="margin-left:20px" placeholder="状态筛选">
+        <el-option
+          v-for="item in stateOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select> -->
       <export-excel table-id="subsidy" file-name="物流补助核准汇总表">导出汇总表</export-excel>
     </div>
     <!-- 表格 -->
@@ -8,7 +16,7 @@
       id="subsidy"
       ref="brandTable"
       :column="tableDesc"
-      :data="tableData"
+      :data="myTableData"
       border
       stripe
       align="center"
@@ -18,7 +26,7 @@
       :current-page.sync="currentPage"
       :total="records"
       :page-size="pageSize"
-      @p-current-change="handleCurrentChange" -->
+    @p-current-change="handleCurrentChange"-->
   </div>
 </template>
 
@@ -100,7 +108,12 @@ export default {
               align: 'center',
               minWidth: '100px'
             },
-            { label: '联系电话', prop: 'phone', align: 'center', minWidth: '100px' },
+            {
+              label: '联系电话',
+              prop: 'phone',
+              align: 'center',
+              minWidth: '100px'
+            },
             {
               label: '收货地址',
               prop: 'address',
@@ -130,8 +143,30 @@ export default {
       ],
       tableData: [],
       currentPage: 1,
-      pageSize: 10,
-      records: 20
+      pageSize: 100000,
+      records: 20,
+      stateOptions: [
+        { value: 100, label: '所有补助' },
+        { value: 0, label: '未核准' },
+        { value: 1, label: '已核准' }
+      ],
+      state: 100
+    }
+  },
+  computed: {
+    myTableData() {
+      const { state } = this
+      let tableData = this.tableData
+      // 其实应该是判断不等于100，但由于confirm不给初始状态
+      // 所以需要单独判断
+      if (state === 1) {
+        tableData = tableData.filter(item => item.confirm === state)
+      } else if (state === 0) {
+        tableData = tableData.filter(
+          item => item.confirm === state || !item.confirm
+        )
+      }
+      return tableData
     }
   },
   mounted() {
@@ -142,12 +177,16 @@ export default {
       pageSize = this.pageSize,
       page = this.currentPage
     } = {}) {
-      const { rows: data, records } = await queryLogisticsByRegion(
+      const { rows: data, records } = await queryLogisticsByRegion({
         pageSize,
         page
-      )
+      })
       data.map(item => {
-        this.$set(item, 'totalWeight', (item.num * item.weight) / 1000)
+        let result = (item.num * item.weight) / 1000
+        if (result.toString().indexOf('.') > -1) {
+          result = result.toFixed(4)
+        }
+        this.$set(item, 'totalWeight', result)
       })
       this.tableData = data
       this.records = records

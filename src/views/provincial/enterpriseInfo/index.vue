@@ -134,7 +134,7 @@ export default {
       pageSize: 10,
       loading: false,
       currentClick: null,
-      state: 0,
+      state: 100,
       stateOptions: [
         { value: 100, label: '所有状态' },
         { value: 0, label: '已保存' },

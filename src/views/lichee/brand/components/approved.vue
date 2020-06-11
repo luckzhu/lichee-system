@@ -22,6 +22,8 @@
       stripe
       align="center"
       :cell-class-name="cellClass"
+      show-summary
+      :summary-method="getSummaries"
     />
     <!-- 表单 -->
     <ele-form-dialog
@@ -179,7 +181,7 @@ export default {
                 </el-button>
                 <el-button
                   type='danger'
-                  disabled={scope.row.state === -1}
+                  disabled={!scope.row.batchNumber || scope.row.state === -1}
                   onClick={() => this.cancelBatchNumber(scope.row)}
                 >
                   作废
@@ -238,7 +240,11 @@ export default {
       this.breeds = breeds
     },
     handleSubmit(data) {
-      data.weight = (data.num * data.packing) / 1000 // 计算总重
+      let result = (data.num * data.packing) / 1000
+      if (result.toString().indexOf('.') > -1) {
+        result = result.toFixed(4)
+      }
+      data.weight = result // 计算总重
       data.state = 0 // 初始状态为0，作废后为-1
       // console.log(this.isExceedYield(data))
 
@@ -331,6 +337,39 @@ export default {
       if (row.state === -1) {
         return 'canceled'
       }
+    },
+    getSummaries(param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        if (column.property === 'weight') {
+          // const values = data.map(item => Number(item[column.property]))
+          const values = data.map(item =>
+            item.state !== -1 ? Number(item['weight']) : Number(0)
+          )
+          if (!values.every(value => isNaN(value))) {
+            let result = values.reduce((prev, curr) => {
+              const value = Number(curr)
+              if (!isNaN(value)) {
+                return prev + curr
+              } else {
+                return prev
+              }
+            }, 0)
+            if (result.toString().indexOf('.') > -1) {
+              result = result.toFixed(4)
+            }
+            sums[index] = result
+          }
+        } else {
+          sums[index] = ''
+        }
+      })
+      return sums
     }
   }
 }

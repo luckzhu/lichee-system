@@ -1,13 +1,17 @@
 <template>
   <div>
-    <table v-for="breed in tableData.data" :key="breed.bId" class="table table-border table-bordered text-c breed-table">
+    <table
+      v-for="breed in tableData.data"
+      :key="breed.bId"
+      class="table table-border table-bordered text-c breed-table"
+    >
       <tr>
         <td>品种</td>
         <td colspan="2">项目</td>
         <td>数值</td>
       </tr>
       <tr>
-        <td rowspan="7">{{ breed.name }}</td>
+        <td rowspan="7">{{ breed.bId | breedName }}</td>
         <td colspan="2">是否上市</td>
         <td>
           <div>
@@ -19,35 +23,60 @@
         </td>
       </tr>
       <tr>
-        <td rowspan="3">本周上市情况</td>
-        <td>基地本周上市量</td>
+        <td rowspan="3" style="width:20px">本周上市情况</td>
+        <td>基地本周上市量（公斤）</td>
         <td>
-          <el-input-number v-model="breed.d1" :disabled="breed.i1 === 0" :controls="false" size="small" />
+          <el-input-number
+            v-model="breed.d1"
+            :disabled="breed.i1 === 0"
+            :controls="false"
+            size="small"
+          />
         </td>
       </tr>
       <tr>
-        <td>基地田头大宗最高价</td>
+        <td>基地田头大宗最高价（元/公斤）</td>
         <td>
-          <el-input-number v-model="breed.d2" :disabled="breed.i1 === 0" :controls="false" size="small" />
+          <el-input-number
+            v-model="breed.d2"
+            :disabled="breed.i1 === 0"
+            :controls="false"
+            size="small"
+          />
         </td>
       </tr>
       <tr>
-        <td>基地田头大宗最低价</td>
+        <td>基地田头大宗最低价（元/公斤）</td>
         <td>
-          <el-input-number v-model="breed.d3" :disabled="breed.i1 === 0" :controls="false" size="small" />
+          <el-input-number
+            v-model="breed.d3"
+            :disabled="breed.i1 === 0"
+            :controls="false"
+            size="small"
+          />
         </td>
       </tr>
       <tr>
         <td rowspan="3">下周预计上市情况</td>
-        <td>预计下周价格</td>
+        <td>预计下周价格（元/公斤）</td>
         <td>
-          <el-input-number v-model="breed.d4" :disabled="breed.i1 === 0" :controls="false" size="small" />
+          <el-input-number
+            v-model="breed.d4"
+            :disabled="breed.i1 === 0"
+            :controls="false"
+            size="small"
+          />
         </td>
       </tr>
       <tr>
-        <td>预计下周基地上市量</td>
+        <td>预计下周基地上市量（公斤）</td>
         <td>
-          <el-input-number v-model="breed.d5" :disabled="breed.i1 === 0" :controls="false" size="small" />
+          <el-input-number
+            v-model="breed.d5"
+            :disabled="breed.i1 === 0"
+            :controls="false"
+            size="small"
+          />
         </td>
       </tr>
       <tr>
@@ -65,7 +94,14 @@
 </template>
 
 <script>
+import { licheeBreedMap } from '@/utils/submit'
+
 export default {
+  filters: {
+    breedName(bId) {
+      return licheeBreedMap.get(bId)
+    }
+  },
   props: {
     // eslint-disable-next-line
     tableData: { type: Object }
@@ -77,7 +113,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.breed-table{
+.breed-table {
   margin-bottom: 20px;
   border: 2px solid #333;
 }

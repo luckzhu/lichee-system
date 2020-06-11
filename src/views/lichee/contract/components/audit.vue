@@ -1,5 +1,5 @@
 <template>
-  <div class="brand-mark">
+  <div class="contract">
     <div style="margin-bottom: 20px">
       <p class="standard">
         <span class="book">合同备案模板（点击下载）</span>。
@@ -120,7 +120,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.brand-mark {
+.contract {
   .standard {
     display: inline-block;
     font-size: 14px;
@@ -139,3 +139,4 @@ export default {
   }
 }
 </style>
+

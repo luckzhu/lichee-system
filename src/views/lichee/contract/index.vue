@@ -32,5 +32,10 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.contract a {
+  cursor: pointer;
+  color: #409eff;
+  text-decoration: underline;
+}
 </style>
