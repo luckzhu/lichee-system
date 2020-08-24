@@ -14,11 +14,6 @@
     "test:ci": "npm run lint && npm run test:unit",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml"
   },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -e $GIT_PARAMS"
-    }
-  },
   "dependencies": {
     "axios": "0.18.1",
     "element-ui": "2.13.0",
