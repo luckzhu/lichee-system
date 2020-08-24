@@ -71,7 +71,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/lichee/base',
     alwaysShow: true,
-    meta: { title: '广东荔枝登记', icon: 'litchee', roles: ['nongye', 'shiji', 'jidi'] },
+    meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'shiji', 'jidi'] },
     children: [
       {
         path: 'base',
@@ -113,6 +113,48 @@ export const asyncRoutes = [
         component: () => import('@/views/lichee/subsidy'),
         meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye', 'shiji'] }
       }
+    ]
+  },
+  {
+    path: '/form',
+    component: Layout,
+    redirect: '/form/weekly/:category',
+    hidden: true,
+    children: [
+      {
+        path: 'weekly/:category',
+        name: 'FormWeekly',
+        component: () => import('@/views/Shared/Form/Weekly'),
+        meta: { title: '周报', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/pomelo',
+    component: Layout,
+    redirect: '/pomelo/base',
+    alwaysShow: true,
+    meta: { title: '广东柚子', icon: 'pomelo' },
+    children: [
+      {
+        path: 'base',
+        name: 'Base',
+        component: () => import('@/views/pomelo/base'),
+        meta: { title: '基地信息登记', icon: 'info' }
+      },
+      {
+        path: 'survey',
+        name: 'Survey',
+        component: () => import('@/views/pomelo/survey'),
+        meta: { title: '基地生产调查', icon: 'survey' }
+      },
+      {
+        path: 'monitor',
+        name: 'Monitor',
+        component: () => import('@/views/pomelo/monitor'),
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo' }
+      }
+
     ]
   },
   {

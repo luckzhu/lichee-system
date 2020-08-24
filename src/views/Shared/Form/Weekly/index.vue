@@ -13,8 +13,8 @@
     <div>
       <lb-table
         v-if="device === 'desktop'"
-        :column="tableData.column"
-        :data="tableData.data"
+        :column="tableDesc"
+        :data="tableData"
         border
         align="center"
       />
@@ -48,9 +48,9 @@
 <script>
 import LbTable from '@/components/LbTable'
 import { addOrUpdateBaseData, getBaseDataByIssueId } from '@/api/task'
-import { licheeBreedMap } from '@/utils/submit'
+import { allBreedMap } from '@/utils/submit'
 import { mapGetters } from 'vuex'
-import TableMobile from './table-mobile'
+import TableMobile from './mobile'
 
 export default {
   name: 'Form',
@@ -60,154 +60,152 @@ export default {
   },
   data() {
     return {
-      tableData: {
-        column: [
-          {
-            prop: 'name',
-            label: '品种',
-            width: '80px',
-            formatter: row => licheeBreedMap.get(row.bId)
-          },
-          {
-            prop: 'i1',
-            label: '是否上市',
-            width: '140px',
-            render: (h, scope) => {
-              return (
-                <div>
-                  <el-radio-group
-                    v-model={scope.row.i1}
-                    disabled={this.disabled}
-                  >
-                    <el-radio label={1}>是</el-radio>
-                    <el-radio label={0}>否</el-radio>
-                  </el-radio-group>
-                </div>
-              )
-            }
-          },
-          {
-            label: '本周上市情况',
-            children: [
-              {
-                label: '基地本周上市量（公斤）',
-                prop: 'd1',
-                align: 'center',
-                render: (h, scope) => {
-                  return (
-                    <div>
-                      <el-input-number
-                        v-model={scope.row.d1}
-                        controls={false}
-                        min={0}
-                        size='small'
-                        disabled={!scope.row.i1 || this.disabled}
-                      ></el-input-number>
-                    </div>
-                  )
-                }
-              },
-              {
-                label: '基地田头大宗最高价（元/公斤）',
-                prop: 'd2',
-                align: 'center',
-                render: (h, scope) => {
-                  return (
-                    <div>
-                      <el-input-number
-                        v-model={scope.row.d2}
-                        controls={false}
-                        min={0}
-                        size='small'
-                        disabled={!scope.row.i1 || this.disabled}
-                      ></el-input-number>
-                    </div>
-                  )
-                }
-              },
-              {
-                label: '基地田头大宗最低价（元/公斤）',
-                prop: 'd3',
-                align: 'center',
-                render: (h, scope) => {
-                  return (
-                    <div>
-                      <el-input-number
-                        v-model={scope.row.d3}
-                        controls={false}
-                        min={0}
-                        size='small'
-                        disabled={!scope.row.i1 || this.disabled}
-                      ></el-input-number>
-                    </div>
-                  )
-                }
-              }
-            ]
-          },
-          {
-            label: '下周预计上市情况',
-            children: [
-              {
-                label: '预计下周价格（元/公斤）',
-                prop: 'd4',
-                align: 'center',
-                render: (h, scope) => {
-                  return (
-                    <div>
-                      <el-input-number
-                        v-model={scope.row.d4}
-                        controls={false}
-                        min={0}
-                        size='small'
-                        disabled={!scope.row.i1 || this.disabled}
-                      ></el-input-number>
-                    </div>
-                  )
-                }
-              },
-              {
-                label: '预计下周基地上市量（公斤）',
-                prop: 'd5',
-                align: 'center',
-                render: (h, scope) => {
-                  return (
-                    <div>
-                      <el-input-number
-                        v-model={scope.row.d5}
-                        controls={false}
-                        min={0}
-                        size='small'
-                        disabled={!scope.row.i1 || this.disabled}
-                      ></el-input-number>
-                    </div>
-                  )
-                }
-              }
-            ]
-          },
-          {
-            prop: 'i2',
-            label: '行情预判',
-            width: '240px',
-            render: (h, scope) => {
-              return (
-                <div>
-                  <el-radio-group
-                    v-model={scope.row.i2}
-                    disabled={!scope.row.i1 || this.disabled}
-                  >
-                    <el-radio label={1}>上涨 </el-radio>
-                    <el-radio label={2}>持平</el-radio>
-                    <el-radio label={3}>下跌</el-radio>
-                  </el-radio-group>
-                </div>
-              )
-            }
+      tableDesc: [
+        {
+          prop: 'name',
+          label: '品种',
+          width: '80px',
+          formatter: row => this.breedMap.get(row.bId)
+        },
+        {
+          prop: 'i1',
+          label: '是否上市',
+          width: '140px',
+          render: (h, scope) => {
+            return (
+              <div>
+                <el-radio-group
+                  v-model={scope.row.i1}
+                  disabled={this.disabled}
+                >
+                  <el-radio label={1}>是</el-radio>
+                  <el-radio label={0}>否</el-radio>
+                </el-radio-group>
+              </div>
+            )
           }
-        ],
-        data: []
-      },
+        },
+        {
+          label: '本周上市情况',
+          children: [
+            {
+              label: '基地本周上市量（公斤）',
+              prop: 'd1',
+              align: 'center',
+              render: (h, scope) => {
+                return (
+                  <div>
+                    <el-input-number
+                      v-model={scope.row.d1}
+                      controls={false}
+                      min={0}
+                      size='small'
+                      disabled={!scope.row.i1 || this.disabled}
+                    ></el-input-number>
+                  </div>
+                )
+              }
+            },
+            {
+              label: '基地田头大宗最高价（元/公斤）',
+              prop: 'd2',
+              align: 'center',
+              render: (h, scope) => {
+                return (
+                  <div>
+                    <el-input-number
+                      v-model={scope.row.d2}
+                      controls={false}
+                      min={0}
+                      size='small'
+                      disabled={!scope.row.i1 || this.disabled}
+                    ></el-input-number>
+                  </div>
+                )
+              }
+            },
+            {
+              label: '基地田头大宗最低价（元/公斤）',
+              prop: 'd3',
+              align: 'center',
+              render: (h, scope) => {
+                return (
+                  <div>
+                    <el-input-number
+                      v-model={scope.row.d3}
+                      controls={false}
+                      min={0}
+                      size='small'
+                      disabled={!scope.row.i1 || this.disabled}
+                    ></el-input-number>
+                  </div>
+                )
+              }
+            }
+          ]
+        },
+        {
+          label: '下周预计上市情况',
+          children: [
+            {
+              label: '预计下周价格（元/公斤）',
+              prop: 'd4',
+              align: 'center',
+              render: (h, scope) => {
+                return (
+                  <div>
+                    <el-input-number
+                      v-model={scope.row.d4}
+                      controls={false}
+                      min={0}
+                      size='small'
+                      disabled={!scope.row.i1 || this.disabled}
+                    ></el-input-number>
+                  </div>
+                )
+              }
+            },
+            {
+              label: '预计下周基地上市量（公斤）',
+              prop: 'd5',
+              align: 'center',
+              render: (h, scope) => {
+                return (
+                  <div>
+                    <el-input-number
+                      v-model={scope.row.d5}
+                      controls={false}
+                      min={0}
+                      size='small'
+                      disabled={!scope.row.i1 || this.disabled}
+                    ></el-input-number>
+                  </div>
+                )
+              }
+            }
+          ]
+        },
+        {
+          prop: 'i2',
+          label: '行情预判',
+          width: '240px',
+          render: (h, scope) => {
+            return (
+              <div>
+                <el-radio-group
+                  v-model={scope.row.i2}
+                  disabled={!scope.row.i1 || this.disabled}
+                >
+                  <el-radio label={1}>上涨 </el-radio>
+                  <el-radio label={2}>持平</el-radio>
+                  <el-radio label={3}>下跌</el-radio>
+                </el-radio-group>
+              </div>
+            )
+          }
+        }
+      ],
+      tableData: [],
       issue: {
         state: null,
         content: null
@@ -229,6 +227,12 @@ export default {
       } else {
         return true
       }
+    },
+    category() {
+      return this.$route.params.category
+    },
+    breedMap() {
+      return allBreedMap[this.category]
     }
   },
   mounted() {
@@ -240,7 +244,7 @@ export default {
         this.issue = res.issue
         this.baseinfo = res.baseinfo
         this.breed = res.breed
-        this.tableData.data = res.breed
+        this.tableData = res.breed
         const { data } = res
         if (data.length > 0) {
           data.forEach(item => {
@@ -251,7 +255,7 @@ export default {
               }
             }
           })
-          this.tableData.data = data
+          this.tableData = data
         }
       })
     },
@@ -259,7 +263,7 @@ export default {
       this.postData(0)
     },
     submit() {
-      if (!this.validate(this.tableData.data)) return
+      if (!this.validate(this.tableData)) return
       this.$confirm('确认提交本期周报吗?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -276,6 +280,7 @@ export default {
         })
     },
     validate(data) {
+      const { breedMap } = this
       const { content } = this.issue
       const message = []
       const requiredArr = [
@@ -297,13 +302,13 @@ export default {
       // 数据必填
       data.forEach(item => {
         if (item.i1 !== 0 && !item.i1) {
-          message.push(`请选择是否上市: ${licheeBreedMap.get(item.bId)}`)
+          message.push(`请选择是否上市: ${breedMap.get(item.bId)}`)
           valid = false
         } else if (item.i1 === 1) {
           requiredArr.map(ele => {
             if (item[ele.field] !== 0 && !item[ele.field]) {
               message.push(
-                `请填写必填项: ${licheeBreedMap.get(item.bId)}-${ele.label}`
+                `请填写必填项: ${breedMap.get(item.bId)}-${ele.label}`
               )
               valid = false
             }
@@ -312,7 +317,7 @@ export default {
           isBiggerThanZero.map(ele => {
             if (item[ele.field] <= 0) {
               message.push(
-                `该项必须大于0: ${licheeBreedMap.get(item.bId)}-${ele.label}`
+                `该项必须大于0: ${breedMap.get(item.bId)}-${ele.label}`
               )
               valid = false
             }
@@ -336,6 +341,8 @@ export default {
       return valid
     },
     postData(state) {
+      const { breedMap } = this
+
       const loading = this.$loading({
         lock: true,
         text: 'Loading',
@@ -344,7 +351,7 @@ export default {
       })
       const { id } = this
       const { content } = this.issue
-      const tempData = JSON.parse(JSON.stringify(this.tableData.data))
+      const tempData = JSON.parse(JSON.stringify(this.tableData))
       const fieldName = ['id', 'scale', 'yield', 'baseId']
       tempData.forEach(item => {
         for (const key in item) {
@@ -358,7 +365,7 @@ export default {
           delete item.d5
           delete item.i2
         }
-        item.name = licheeBreedMap.get(item.bId)
+        item.name = breedMap.get(item.bId)
         item.biId = id
       })
       const data = JSON.stringify(tempData)

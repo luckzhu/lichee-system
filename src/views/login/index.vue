@@ -144,7 +144,7 @@ export default {
       loginForm: {
         // 91441403707578965U  123456
         // 93441303675202700W  123456
-        // 4401 123
+        // 4401 abcd1234
         // account: 'mtp6300138',
         // password: 'mtp6300138',
         account: '',

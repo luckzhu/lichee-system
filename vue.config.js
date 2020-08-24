@@ -39,7 +39,7 @@ module.exports = {
     // before: require('./mock/mock-server.js'),
     proxy: {
       '/': {
-        target: 'http://192.168.2.16:9200',
+        target: 'http://192.168.1.247:9200',
         changeOrigin: true,
         ws: false
       }
