@@ -67,37 +67,52 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    path: '/municipal',
+    component: Layout,
+    redirect: '/municipal/base',
+    alwaysShow: true,
+    meta: { title: '市级管理', icon: 'user' },
+    children: [
+      {
+        path: 'base',
+        name: 'municipalBase',
+        component: () => import('@/views/municipal/base'),
+        meta: { title: '基地信息', icon: 'info', roles: ['shiji'] }
+      }
+    ]
+  },
+  {
     path: '/lichee',
     component: Layout,
     redirect: '/lichee/base',
     alwaysShow: true,
-    meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'shiji', 'jidi'] },
+    meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'jidi'] },
     children: [
       {
         path: 'base',
         name: 'Base',
         component: () => import('@/views/lichee/base'),
-        meta: { title: '基地信息登记', icon: 'info', roles: ['nongye', 'shiji'] }
+        meta: { title: '基地信息登记', icon: 'info', roles: ['nongye'] }
       },
       {
         path: 'brand',
         name: 'Brand',
         // hidden: true,
         component: () => import('@/views/lichee/brand'),
-        meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye', 'shiji'] }
+        meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye'] }
       },
       {
         path: 'contract',
         name: 'Contract',
         // hidden: true,
         component: () => import('@/views/lichee/contract'),
-        meta: { title: '合同备案登记', icon: 'register', roles: ['nongye', 'shiji'] }
+        meta: { title: '合同备案登记', icon: 'register', roles: ['nongye'] }
       },
       {
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/lichee/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', noCache: true, roles: ['nongye', 'shiji', 'jidi'] }
+        meta: { title: '生产供应监测', icon: 'monitor', noCache: true, roles: ['nongye', 'jidi'] }
       },
       {
         path: 'weeklyForm',
@@ -111,7 +126,7 @@ export const asyncRoutes = [
         name: 'Subsidy',
         // hidden: true,
         component: () => import('@/views/lichee/subsidy'),
-        meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye', 'shiji'] }
+        meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye'] }
       }
     ]
   },
@@ -129,6 +144,7 @@ export const asyncRoutes = [
       }
     ]
   },
+
   {
     path: '/pomelo',
     component: Layout,

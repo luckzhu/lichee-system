@@ -1,18 +1,24 @@
 <template>
   <div>
-    <Base />
+    <Base :category-and-breed="categoryAndBreed" />
   </div>
 </template>
 
 <script>
 import Base from '@/views/Shared/Base/index'
+import { allBreedMap } from '@/utils/submit'
+
 export default {
   components: {
     Base
+  },
+  data() {
+    return {
+      categoryAndBreed: allBreedMap.pomelo
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>

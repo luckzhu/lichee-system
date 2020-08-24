@@ -65,7 +65,7 @@ export default {
           prop: 'name',
           label: '品种',
           width: '80px',
-          formatter: row => this.breedMap.get(row.bId)
+          formatter: row => this.breedMap[row.bId]
         },
         {
           prop: 'i1',
@@ -232,7 +232,7 @@ export default {
       return this.$route.params.category
     },
     breedMap() {
-      return allBreedMap[this.category]
+      return allBreedMap[this.category].bIds
     }
   },
   mounted() {
@@ -302,13 +302,13 @@ export default {
       // 数据必填
       data.forEach(item => {
         if (item.i1 !== 0 && !item.i1) {
-          message.push(`请选择是否上市: ${breedMap.get(item.bId)}`)
+          message.push(`请选择是否上市: ${breedMap[item.bId]}`)
           valid = false
         } else if (item.i1 === 1) {
           requiredArr.map(ele => {
             if (item[ele.field] !== 0 && !item[ele.field]) {
               message.push(
-                `请填写必填项: ${breedMap.get(item.bId)}-${ele.label}`
+                `请填写必填项: ${breedMap[item.bId]}-${ele.label}`
               )
               valid = false
             }
@@ -317,7 +317,7 @@ export default {
           isBiggerThanZero.map(ele => {
             if (item[ele.field] <= 0) {
               message.push(
-                `该项必须大于0: ${breedMap.get(item.bId)}-${ele.label}`
+                `该项必须大于0: ${breedMap[item.bId]}-${ele.label}`
               )
               valid = false
             }
@@ -365,7 +365,7 @@ export default {
           delete item.d5
           delete item.i2
         }
-        item.name = breedMap.get(item.bId)
+        item.name = breedMap[item.bId]
         item.biId = id
       })
       const data = JSON.stringify(tempData)

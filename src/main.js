@@ -9,6 +9,9 @@ import EleForm from 'vue-ele-form'
 import EleFormUploadFile from 'vue-ele-form-upload-file'
 Vue.component('upload-file', EleFormUploadFile)
 
+import EleFormDynamic from 'vue-ele-form-dynamic'
+Vue.component('dynamic', EleFormDynamic)
+
 import LbTable from '@/components/LbTable'
 Vue.component('LbTable', LbTable)
 
