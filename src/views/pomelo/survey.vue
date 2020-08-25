@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div class="survey-container">
+
+    <p class="title">2020年广东柚子企业生产调查表</p>
     <Survey />
   </div>
 </template>
@@ -14,5 +16,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.survey-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .title{
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
 
 </style>

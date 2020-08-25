@@ -192,3 +192,21 @@ export function queryContractByRegion(params) {
     params
   })
 }
+
+// 新增或编辑企业调查表 data
+export function addOrUpdateUnitIndustry(data) {
+  return request({
+    url: '/base/addOrUpdateUnitIndustry',
+    method: 'post',
+    data
+  })
+}
+
+// 获取企业调查表 year
+export function getUnitIndustry(params) {
+  return request({
+    url: '/base/getUnitIndustry',
+    method: 'get',
+    params
+  })
+}

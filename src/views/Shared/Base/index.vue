@@ -465,10 +465,11 @@ export default {
   },
   methods: {
     async getBaseList() {
-      const { isAuditor, currentPage, pageSize } = this
+      const { isAuditor, currentPage, pageSize, categoryAndBreed } = this
+      console.log(categoryAndBreed.categoryId)
       const { rows, records } = isAuditor
         ? await queryBaseByRegionCode({ page: currentPage, pageSize })
-        : await queryBase({ page: currentPage, pageSize })
+        : await queryBase({ page: currentPage, pageSize, bId: categoryAndBreed.categoryId })
       this.tableData = rows
       this.total = records
     },

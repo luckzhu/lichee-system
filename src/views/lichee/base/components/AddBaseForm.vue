@@ -16,7 +16,7 @@
       @request-error="handleError"
     >
       <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
-      <template v-for="item in numFields" v-slot:[item]="{ desc, data, field, formData }">
+      <template v-for="item in numFields" v-slot:[item]="{ formData }">
         <el-input-number
           :key="item"
           v-model="formData[item]"
@@ -25,7 +25,7 @@
         />
       </template>
       <!-- 存在初始校验的bug,所以改为slot -->
-      <template v-slot:regionCode="{ desc, data, field, formData }">
+      <template v-slot:regionCode="{ formData }">
         <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
       </template>
     </ele-form>

@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="title-container">
-      <h3 class="title">广东荔枝区域公用品牌管理系统</h3>
+      <h3 class="title">广东区域公用品牌管理系统</h3>
     </div>
 
     <el-form
