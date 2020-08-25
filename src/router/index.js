@@ -71,65 +71,65 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/municipal/base',
     alwaysShow: true,
-    meta: { title: '市级管理', icon: 'user' },
+    meta: { title: '市级管理', icon: 'user', roles: ['shiji'] },
     children: [
       {
         path: 'base',
         name: 'municipalBase',
         component: () => import('@/views/municipal/base'),
-        meta: { title: '基地信息', icon: 'info', roles: ['shiji'] }
+        meta: { title: '基地信息', icon: 'info' }
       }
     ]
   },
-  {
-    path: '/lichee',
-    component: Layout,
-    redirect: '/lichee/base',
-    alwaysShow: true,
-    meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'jidi'] },
-    children: [
-      {
-        path: 'base',
-        name: 'Base',
-        component: () => import('@/views/lichee/base'),
-        meta: { title: '基地信息登记', icon: 'info', roles: ['nongye'] }
-      },
-      {
-        path: 'brand',
-        name: 'Brand',
-        // hidden: true,
-        component: () => import('@/views/lichee/brand'),
-        meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye'] }
-      },
-      {
-        path: 'contract',
-        name: 'Contract',
-        // hidden: true,
-        component: () => import('@/views/lichee/contract'),
-        meta: { title: '合同备案登记', icon: 'register', roles: ['nongye'] }
-      },
-      {
-        path: 'monitor',
-        name: 'Monitor',
-        component: () => import('@/views/lichee/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', noCache: true, roles: ['nongye', 'jidi'] }
-      },
-      {
-        path: 'weeklyForm',
-        name: 'WeeklyForm',
-        hidden: true,
-        component: () => import('@/views/lichee/monitor/components/reportsWeekly/form'),
-        meta: { title: '周报', activeMenu: '/lichee/monitor' }
-      },
-      {
-        path: 'subsidy',
-        name: 'Subsidy',
-        // hidden: true,
-        component: () => import('@/views/lichee/subsidy'),
-        meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye'] }
-      }
-    ]
-  },
+  // {
+  //   path: '/lichee',
+  //   component: Layout,
+  //   redirect: '/lichee/base',
+  //   alwaysShow: true,
+  //   meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'jidi'] },
+  //   children: [
+  //     {
+  //       path: 'base',
+  //       name: 'Base',
+  //       component: () => import('@/views/lichee/base'),
+  //       meta: { title: '基地信息登记', icon: 'info', roles: ['nongye'] }
+  //     },
+  //     {
+  //       path: 'brand',
+  //       name: 'Brand',
+  //       // hidden: true,
+  //       component: () => import('@/views/lichee/brand'),
+  //       meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye'] }
+  //     },
+  //     {
+  //       path: 'contract',
+  //       name: 'Contract',
+  //       // hidden: true,
+  //       component: () => import('@/views/lichee/contract'),
+  //       meta: { title: '合同备案登记', icon: 'register', roles: ['nongye'] }
+  //     },
+  //     {
+  //       path: 'monitor',
+  //       name: 'Monitor',
+  //       component: () => import('@/views/lichee/monitor'),
+  //       meta: { title: '生产供应监测', icon: 'monitor', noCache: true, roles: ['nongye', 'jidi'] }
+  //     },
+  //     {
+  //       path: 'weeklyForm',
+  //       name: 'WeeklyForm',
+  //       hidden: true,
+  //       component: () => import('@/views/lichee/monitor/components/reportsWeekly/form'),
+  //       meta: { title: '周报', activeMenu: '/lichee/monitor' }
+  //     },
+  //     {
+  //       path: 'subsidy',
+  //       name: 'Subsidy',
+  //       // hidden: true,
+  //       component: () => import('@/views/lichee/subsidy'),
+  //       meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye'] }
+  //     }
+  //   ]
+  // },
   {
     path: '/form',
     component: Layout,
@@ -170,9 +170,37 @@ export const asyncRoutes = [
         component: () => import('@/views/pomelo/monitor'),
         meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo' }
       }
-
     ]
   },
+
+  {
+    path: '/orange',
+    component: Layout,
+    redirect: '/orange/base',
+    alwaysShow: true,
+    meta: { title: '广东柑桔橙', icon: 'pomelo' },
+    children: [
+      {
+        path: 'base',
+        name: 'Base',
+        component: () => import('@/views/orange/base'),
+        meta: { title: '基地信息登记', icon: 'info' }
+      },
+      {
+        path: 'survey',
+        name: 'Survey',
+        component: () => import('@/views/orange/survey'),
+        meta: { title: '基地生产调查', icon: 'survey' }
+      },
+      {
+        path: 'monitor',
+        name: 'Monitor',
+        component: () => import('@/views/orange/monitor'),
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo' }
+      }
+    ]
+  },
+
   {
     path: '/provincial',
     component: Layout,
