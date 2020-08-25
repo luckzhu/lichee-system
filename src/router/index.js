@@ -149,25 +149,25 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/lichee/base',
     alwaysShow: true,
-    meta: { title: '广东荔枝', icon: 'lichee' },
+    meta: { title: '广东荔枝', icon: 'lichee', roles: ['lizhi', 'nongye', 'lizhijidi'] },
     children: [
       {
         path: 'base',
         name: 'Base',
         component: () => import('@/views/lichee/base'),
-        meta: { title: '基地信息登记', icon: 'info' }
+        meta: { title: '基地信息登记', icon: 'info', roles: ['lizhi', 'nongye'] }
       },
       {
         path: 'survey',
         name: 'Survey',
         component: () => import('@/views/lichee/survey'),
-        meta: { title: '基地生产调查', icon: 'survey' }
+        meta: { title: '基地生产调查', icon: 'survey', roles: ['lizhi', 'nongye'] }
       },
       {
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/lichee/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', category: 'lichee', bId: 100 }
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'lichee', bId: 100, roles: ['lizhi', 'nongye', 'lizhijidi'] }
       }
     ]
   },
@@ -176,25 +176,25 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/pomelo/base',
     alwaysShow: true,
-    meta: { title: '广东柚子', icon: 'pomelo' },
+    meta: { title: '广东柚子', icon: 'pomelo', roles: ['youzi', 'nongye', 'youzijidi'] },
     children: [
       {
         path: 'base',
         name: 'Base',
         component: () => import('@/views/pomelo/base'),
-        meta: { title: '基地信息登记', icon: 'info' }
+        meta: { title: '基地信息登记', icon: 'info', roles: ['youzi', 'nongye'] }
       },
       {
         path: 'survey',
         name: 'Survey',
         component: () => import('@/views/pomelo/survey'),
-        meta: { title: '基地生产调查', icon: 'survey' }
+        meta: { title: '基地生产调查', icon: 'survey', roles: ['youzi', 'nongye'] }
       },
       {
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/pomelo/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo', bId: 200 }
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo', bId: 200, roles: ['youzi', 'nongye', 'youzijidi'] }
       }
     ]
   },
@@ -204,25 +204,25 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/orange/base',
     alwaysShow: true,
-    meta: { title: '广东柑桔橙', icon: 'pomelo' },
+    meta: { title: '广东柑桔橙', icon: 'pomelo', roles: ['ganjicheng', 'nongye', 'ganjichengjidi'] },
     children: [
       {
         path: 'base',
         name: 'Base',
         component: () => import('@/views/orange/base'),
-        meta: { title: '基地信息登记', icon: 'info' }
+        meta: { title: '基地信息登记', icon: 'info', roles: ['ganjicheng', 'nongye'] }
       },
       {
         path: 'survey',
         name: 'Survey',
         component: () => import('@/views/orange/survey'),
-        meta: { title: '基地生产调查', icon: 'survey' }
+        meta: { title: '基地生产调查', icon: 'survey', roles: ['ganjicheng', 'nongye'] }
       },
       {
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/orange/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', category: 'orange', bId: 300 }
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'orange', bId: 300, roles: ['ganjicheng', 'nongye', 'ganjichengjidi'] }
       }
     ]
   },

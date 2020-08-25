@@ -14,13 +14,21 @@
           <td rowspan="2">{{ item.label }}</td>
           <td>2019年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number v-model="tableData[key][item.present]" :controls="false" style="width:100px" />
+            <el-input-number
+              v-model="tableData[key][item.present]"
+              :controls="false"
+              style="width:100px"
+            />
           </td>
         </tr>
         <tr :key="item.label+'next'">
           <td>2020年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number v-model="tableData[key][item.next]" :controls="false" style="width:100px" />
+            <el-input-number
+              v-model="tableData[key][item.next]"
+              :controls="false"
+              style="width:100px"
+            />
           </td>
         </tr>
       </template>
@@ -32,7 +40,11 @@
       <tr v-for="item in indicatorPart2.children" :key="item.field">
         <td>{{ item.label }}</td>
         <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-          <el-input-number v-model="tableData[key][item.field]" :controls="false" style="width:100px" />
+          <el-input-number
+            v-model="tableData[key][item.field]"
+            :controls="false"
+            style="width:100px"
+          />
         </td>
       </tr>
     </table>
@@ -131,7 +143,10 @@ export default {
     async getBaseSurveyTable() {
       const {
         data: { info }
-      } = await getUnitIndustry({ year: 2020, bId: this.categoryAndBreed.categoryId })
+      } = await getUnitIndustry({
+        year: 2020,
+        bId: this.categoryAndBreed.categoryId
+      })
 
       if (info && info.length === 0) {
         this.initData()
@@ -150,14 +165,21 @@ export default {
     },
     revertData(data) {
       const obj = {}
-      data.forEach(item => {
+      data.forEach((item) => {
         for (const key in item) {
           if (!item[key]) {
             delete item[key]
           }
         }
-        Object.assign(obj, {
-          [item.bId]: item
+        Object.keys(this.categoryAndBreed.bIds).forEach((ele) => {
+          console.log(ele, item.bId)
+          if (item.bId === Number(ele)) {
+            Object.assign(obj, {
+              [ele]: item
+            })
+          } else {
+            Object.assign(obj, { [ele]: {}})
+          }
         })
       })
       this.tableData = obj
