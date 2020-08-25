@@ -18,7 +18,7 @@
         @request-error="handleError"
       >
         <!-- 存在初始校验的bug,所以改为slot -->
-        <template v-slot:regionCode="{ desc, data, field, formData }">
+        <template v-slot:regionCode="{ formData }">
           <el-cascader v-model="formData.regionCode" :props="cascaderProps" />
         </template>
       </ele-form>
@@ -139,8 +139,22 @@ export default {
           label: '单位类型',
           required: true,
           options: [
-            { text: '荔枝企业', value: 1 },
+            { text: '农业企业', value: 1 },
             { text: '物流企业', value: 2 }
+          ]
+        },
+        bIds: {
+          type: 'checkbox',
+          label: '企业类型',
+          vif: data => data.roleId === 1,
+          valueFormatter(value) {
+            return value.join(',')
+          },
+          required: true,
+          options: [
+            { text: '荔枝', value: 100 },
+            { text: '柚子', value: 200 },
+            { text: '柑桔橙', value: 300 }
           ]
         },
         contactName: {
@@ -201,7 +215,6 @@ export default {
       const { regionCode } = data
       data.regionCode = regionCode[regionCode.length - 1]
       delete data.rePassword
-
       return new Promise(async(resolve, reject) => {
         try {
           const res = await register(data)
