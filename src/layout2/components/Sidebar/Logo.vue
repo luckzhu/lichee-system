@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: '广东荔枝区域公用品牌',
+      title: '广东区域公用品牌',
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
       logo: require('@/assets/logo/lichee.png')
     }
@@ -68,7 +68,7 @@ export default {
       color: #fff;
       font-weight: 600;
       line-height: 50px;
-      font-size: 12px;
+      font-size: 16px;
       letter-spacing: 2px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;

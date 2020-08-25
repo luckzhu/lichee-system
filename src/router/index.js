@@ -86,7 +86,7 @@ export const asyncRoutes = [
   //   component: Layout,
   //   redirect: '/lichee/base',
   //   alwaysShow: true,
-  //   meta: { title: '广东荔枝', icon: 'litchee', roles: ['nongye', 'jidi'] },
+  //   meta: { title: '广东荔枝', icon: 'lichee', roles: ['nongye', 'jidi'] },
   //   children: [
   //     {
   //       path: 'base',
@@ -144,7 +144,33 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  {
+    path: '/lichee',
+    component: Layout,
+    redirect: '/lichee/base',
+    alwaysShow: true,
+    meta: { title: '广东荔枝', icon: 'lichee' },
+    children: [
+      {
+        path: 'base',
+        name: 'Base',
+        component: () => import('@/views/lichee/base'),
+        meta: { title: '基地信息登记', icon: 'info' }
+      },
+      {
+        path: 'survey',
+        name: 'Survey',
+        component: () => import('@/views/lichee/survey'),
+        meta: { title: '基地生产调查', icon: 'survey' }
+      },
+      {
+        path: 'monitor',
+        name: 'Monitor',
+        component: () => import('@/views/lichee/monitor'),
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'lichee', bId: 100 }
+      }
+    ]
+  },
   {
     path: '/pomelo',
     component: Layout,
@@ -168,7 +194,7 @@ export const asyncRoutes = [
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/pomelo/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo' }
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo', bId: 200 }
       }
     ]
   },
@@ -196,7 +222,7 @@ export const asyncRoutes = [
         path: 'monitor',
         name: 'Monitor',
         component: () => import('@/views/orange/monitor'),
-        meta: { title: '生产供应监测', icon: 'monitor', category: 'pomelo' }
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'orange', bId: 300 }
       }
     ]
   },
@@ -206,7 +232,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/provincial/enterpriseInfo',
     alwaysShow: true,
-    meta: { title: '省级查看', icon: 'litchee', roles: ['shengji'] },
+    meta: { title: '省级查看', icon: 'lichee', roles: ['shengji'] },
     children: [
       {
         path: 'enterpriseInfo',

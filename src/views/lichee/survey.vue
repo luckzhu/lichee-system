@@ -1,6 +1,6 @@
 <template>
   <div class="survey-container">
-    <p class="title">2020年广东柑桔橙企业生产调查表</p>
+    <p class="title">2020年广东荔枝企业生产调查表</p>
     <Survey :category-and-breed="categoryAndBreed" />
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
   },
   data() {
     return {
-      categoryAndBreed: allBreedMap.orange
+      categoryAndBreed: allBreedMap.lichee
     }
   }
 }
@@ -27,6 +27,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   .title{
     font-size: 20px;
     font-weight: 600;

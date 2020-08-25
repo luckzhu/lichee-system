@@ -115,6 +115,9 @@ export default {
     },
     category() {
       return this.$route.meta.category
+    },
+    bId() {
+      return this.$route.meta.bId
     }
   },
   mounted() {
@@ -129,11 +132,12 @@ export default {
       })
     },
     async getIssue() {
+      const { bId } = this
       if (this.isBase) {
-        const { rows } = await queryIssueByBaseId()
+        const { rows } = await queryIssueByBaseId({ bId })
         this.tableData = rows
       } else {
-        const { rows } = await queryIssueByUnitId()
+        const { rows } = await queryIssueByUnitId({ bId })
         this.tableData = rows
       }
     },

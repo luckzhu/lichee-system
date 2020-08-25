@@ -3,10 +3,10 @@
     <table
       v-if="isRenderTable"
       class="table table-border table-bordered text-c breed-table"
-      style=" margin-bottom: 60px;"
+      style=" margin-bottom: 60px;white-space: nowrap"
     >
       <tr>
-        <td colspan="2">指标</td>
+        <td colspan="2">指标（2020年为预计数目）</td>
         <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">{{ breed }}</td>
       </tr>
       <template v-for="item in indicator">
@@ -14,13 +14,13 @@
           <td rowspan="2">{{ item.label }}</td>
           <td>2019年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number v-model="tableData[key][item.present]" :controls="false" />
+            <el-input-number v-model="tableData[key][item.present]" :controls="false" style="width:100px" />
           </td>
         </tr>
         <tr :key="item.label+'next'">
-          <td>2020年（预计）</td>
+          <td>2020年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number v-model="tableData[key][item.next]" :controls="false" />
+            <el-input-number v-model="tableData[key][item.next]" :controls="false" style="width:100px" />
           </td>
         </tr>
       </template>
@@ -32,7 +32,7 @@
       <tr v-for="item in indicatorPart2.children" :key="item.field">
         <td>{{ item.label }}</td>
         <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-          <el-input-number v-model="tableData[key][item.field]" :controls="false" />
+          <el-input-number v-model="tableData[key][item.field]" :controls="false" style="width:100px" />
         </td>
       </tr>
     </table>
@@ -93,7 +93,7 @@ export default {
           next: 'nextFruitBearing'
         },
         {
-          label: '上市时间（*月*日）',
+          label: '上市时间（0825）',
           present: 'saleTime',
           next: 'nextSaleTime'
         },
@@ -131,7 +131,7 @@ export default {
     async getBaseSurveyTable() {
       const {
         data: { info }
-      } = await getUnitIndustry({ year: 2020 })
+      } = await getUnitIndustry({ year: 2020, bId: this.categoryAndBreed.categoryId })
 
       if (info && info.length === 0) {
         this.initData()
