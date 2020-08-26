@@ -147,15 +147,18 @@ export default {
         },
         {
           prop: 'contactPhone',
-          label: '手机号'
+          label: '手机号',
+          minWidth: '110px'
         },
         {
           prop: 'scale',
-          label: '基地面积（亩）'
+          label: '基地面积（亩）',
+          minWidth: '120px'
         },
         {
           prop: 'yield',
-          label: '预计产量（公斤）'
+          label: '预计产量（公斤）',
+          minWidth: '120px'
         },
         // {
         //   prop: 'coldScale',
@@ -222,7 +225,7 @@ export default {
             return (
               <div>
                 <el-tag type={haveAccount ? 'success' : 'info'}>
-                  {haveAccount ? '已生成' : '未生成'}
+                  {haveAccount ? '已生成' : '等待审核'}
                 </el-tag>
               </div>
             )
@@ -230,22 +233,7 @@ export default {
         },
         {
           label: '操作',
-          minWidth: '200px',
           render: (h, scope) => {
-            let create
-            if (this.roles.includes('nongye')) {
-              create = (
-                <el-button
-                  type='warning'
-                  disabled={scope.row.state !== 2}
-                  onClick={() => {
-                    this.createBaseAccount(scope.row.id)
-                  }}
-                >
-                  创建基地账号
-                </el-button>
-              )
-            }
             return (
               <div className='button-group'>
                 <el-button
@@ -254,13 +242,10 @@ export default {
                       ? 'primary'
                       : 'warning'
                   }
-                  onClick={() => {
-                    this.toBaseForm(scope.row)
-                  }}
+                  onClick={() => { this.toBaseForm(scope.row) }}
                 >
                   {this.isAuditor && scope.row.state !== 2 ? '审核' : '查看'}
                 </el-button>
-                {create}
               </div>
             )
           }
@@ -458,6 +443,14 @@ export default {
     },
     isShowFormBtn() {
       return !this.isAuditor
+    },
+    bId() {
+      return this.categoryAndBreed.categoryId
+    }
+  },
+  watch: {
+    bId() {
+      this.getBaseList()
     }
   },
   mounted() {
@@ -465,11 +458,10 @@ export default {
   },
   methods: {
     async getBaseList() {
-      const { isAuditor, currentPage, pageSize, categoryAndBreed } = this
-      console.log(categoryAndBreed.categoryId)
+      const { isAuditor, currentPage, pageSize, bId } = this
       const { rows, records } = isAuditor
-        ? await queryBaseByRegionCode({ page: currentPage, pageSize })
-        : await queryBase({ page: currentPage, pageSize, bId: categoryAndBreed.categoryId })
+        ? await queryBaseByRegionCode({ page: currentPage, pageSize, bId })
+        : await queryBase({ page: currentPage, pageSize, bId })
       this.tableData = rows
       this.total = records
     },
