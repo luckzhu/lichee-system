@@ -2,7 +2,7 @@
   <div>
     <table
       v-if="isRenderTable"
-      class="table table-border table-bordered text-c breed-table"
+      class="table table-border table-bordered text-c"
       style=" margin-bottom: 60px;white-space: nowrap"
     >
       <tr>
@@ -14,21 +14,43 @@
           <td rowspan="2">{{ item.label }}</td>
           <td>2019年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number
-              v-model="tableData[key][item.present]"
-              :controls="false"
-              style="width:100px"
-            />
+            <template v-if="item.type === 'date'">
+              <el-date-picker
+                v-model="tableData[key][item.present]"
+                type="date"
+                placeholder="选择日期"
+                style="width:150px"
+                value-format="yyyy-MM-dd"
+              />
+            </template>
+            <template v-else>
+              <el-input-number
+                v-model="tableData[key][item.present]"
+                :controls="false"
+                style="width:150px"
+              />
+            </template>
           </td>
         </tr>
         <tr :key="item.label+'next'">
           <td>2020年</td>
           <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
-            <el-input-number
-              v-model="tableData[key][item.next]"
-              :controls="false"
-              style="width:100px"
-            />
+            <template v-if="item.type === 'date'">
+              <el-date-picker
+                v-model="tableData[key][item.next]"
+                type="date"
+                placeholder="选择日期"
+                style="width:150px"
+                value-format="yyyy-MM-dd"
+              />
+            </template>
+            <template v-else>
+              <el-input-number
+                v-model="tableData[key][item.next]"
+                :controls="false"
+                style="width:150px"
+              />
+            </template>
           </td>
         </tr>
       </template>
@@ -43,15 +65,15 @@
           <el-input-number
             v-model="tableData[key][item.field]"
             :controls="false"
-            style="width:100px"
+            style="width:150px"
           />
         </td>
       </tr>
     </table>
 
     <footer>
-      <el-button type="primary" @click="save">保存但不提交</el-button>
-      <el-button type="success" @click="submit">数据无误并提交</el-button>
+      <el-button type="primary" @click="save">保存数据</el-button>
+      <!-- <el-button type="success" @click="submit">数据无误并提交</el-button> -->
     </footer>
   </div>
 </template>
@@ -105,9 +127,10 @@ export default {
           next: 'nextFruitBearing'
         },
         {
-          label: '上市时间（0825）',
+          label: '上市时间',
           present: 'saleTime',
-          next: 'nextSaleTime'
+          next: 'nextSaleTime',
+          type: 'date'
         },
         {
           label: '上市价格（元/公斤）',
@@ -171,16 +194,13 @@ export default {
             delete item[key]
           }
         }
-        Object.keys(this.categoryAndBreed.bIds).forEach((ele) => {
-          console.log(ele, item.bId)
-          if (item.bId === Number(ele)) {
-            Object.assign(obj, {
-              [ele]: item
-            })
-          } else {
-            Object.assign(obj, { [ele]: {}})
-          }
-        })
+        Object.assign(obj, { [item.bId]: item })
+      })
+      Object.keys(this.categoryAndBreed.bIds).forEach((ele) => {
+        const objKeys = Object.keys(obj)
+        if (!objKeys.includes(ele)) {
+          Object.assign(obj, { [ele]: {}})
+        }
       })
       this.tableData = obj
     },
@@ -195,7 +215,13 @@ export default {
       const res = await addOrUpdateUnitIndustry({
         data: JSON.stringify(postData)
       })
-      console.log(res)
+      if (res.code === 200) {
+        this.$message.success('操作成功')
+      } else {
+        this.$message.error('操作失败')
+      }
+
+      this.getBaseSurveyTable()
     },
     convertData(data) {
       const arr = []
