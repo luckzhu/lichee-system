@@ -9,6 +9,14 @@
         生产基地：
         <span>{{ baseinfo.name }}</span>
       </p>
+      <p>
+        数据计算时间：
+        <span>{{ issue.dataBegin }} 至 {{ issue.dataEnd }}</span>
+      </p>
+      <p>
+        报送截止时间：
+        <span>{{ issue.endTime }}</span>
+      </p>
     </div>
     <div>
       <lb-table
