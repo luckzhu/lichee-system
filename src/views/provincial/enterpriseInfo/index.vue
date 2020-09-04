@@ -25,6 +25,7 @@
     </div>
     <lb-table
       ref="brandTable"
+      v-loading="tableLoading"
       :column="tableDesc"
       :data="mytableData.slice( (currentPage - 1) * pageSize, currentPage * pageSize )"
       border
@@ -37,6 +38,7 @@
       :page-size="pageSize"
       @p-current-change="handleCurrentChange"
     />
+
   </div>
 </template>
 
@@ -106,10 +108,11 @@ export default {
         },
         {
           label: '操作',
-          width: '220px',
+          width: '280px',
           render: (h, scope) => {
             return (
               <div className='button-group'>
+                <el-button type='warning' onClick={() => this.editUnitBase(scope.row.id)} >查看基地</el-button>
                 <el-button
                   type='primary'
                   loading={scope.row === this.currentClick && this.loading}
@@ -141,7 +144,8 @@ export default {
         { value: 2, label: '审核通过' },
         { value: 3, label: '退回待修改' }
       ],
-      searchUnitName: null
+      searchUnitName: null,
+      tableLoading: false
     }
   },
   computed: {
@@ -169,8 +173,10 @@ export default {
   },
   methods: {
     async getEnterprises() {
+      this.tableLoading = true
       const { rows: data } = await queryUnit({ pageSize: 100000 })
       this.tableData = data
+      this.tableLoading = false
     },
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage
@@ -179,12 +185,16 @@ export default {
       this.currentClick = row
       this.loading = true
       const { userId } = row
-      const res = await validUnit({ userId, state })
-      if (res.code === 200) {
-        this.$message(res.data.info)
-        this.getEnterprises()
+      try {
+        const res = await validUnit({ userId, state })
+        if (res.code === 200) {
+          this.$message(res.data.info)
+          this.getEnterprises()
+        }
+        this.loading = false
+      } catch (err) {
+        this.loading = false
       }
-      this.loading = false
     },
     querySearch(queryString, cb) {
       const tableData = this.mytableData
@@ -206,6 +216,11 @@ export default {
     },
     handleSelect(item) {
       console.log(item)
+    },
+    editUnitBase(id) {
+      this.$router.push({
+        path: `/provincial/base/${id}`
+      })
     }
   }
 }

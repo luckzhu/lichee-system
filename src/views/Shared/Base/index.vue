@@ -6,6 +6,7 @@
     </div>
 
     <lb-table
+      v-loading="loading"
       :column="columns"
       :data="tableData"
       border
@@ -40,6 +41,7 @@
         is-dialog
         :visible.sync="dialogFormVisible"
         @request-success="handleSuccess"
+        @request-error="handleRequestError"
       >
         <!-- 由于插件自带的type:number 默认值有bug,所有改用slot的写法 -->
         <template v-for="item in numFields" v-slot:[item]="{ formData }">
@@ -69,7 +71,8 @@ import {
   addBase,
   queryBaseByRegionCode,
   validBase,
-  generateBaseAccount
+  generateBaseAccount,
+  sendBaseMsg
 } from '@/api/base'
 import { mapGetters } from 'vuex'
 
@@ -94,6 +97,14 @@ export default {
     isAuditor: {
       type: Boolean,
       default: false
+    },
+    unitId: {
+      type: Number,
+      default: null
+    },
+    sendMsgVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -106,13 +117,26 @@ export default {
       formData: {},
       formDisabled: false,
       approved: false,
-      btnLoading: false
+      btnLoading: false,
+      loading: false
     }
   },
   computed: {
     ...mapGetters(['roles', 'isMobile']),
 
     columns() {
+      const sendMsg = []
+      if (this.sendMsgVisible) {
+        sendMsg.push({
+          label: '短信',
+          width: '100px',
+          render: (h, scope) => {
+            return (
+              <el-button type='warning' onClick={() => this.sendMsgToBase(scope.row.id)}>发送短信</el-button>
+            )
+          }
+        })
+      }
       return [
         {
           label: '序号',
@@ -160,34 +184,6 @@ export default {
           label: '预计产量（公斤）',
           minWidth: '120px'
         },
-        // {
-        //   prop: 'coldScale',
-        //   label: '冷库容积（m³）',
-        // },
-        // {
-        //   prop: 'coldCar',
-        //   label: '冷链车（台）',
-        // },
-        // {
-        //   prop: 'levelDevice',
-        //   label: '分级设备',
-        //   formatter: (row) => (row.levelDevice ? '有' : '无')
-        // },
-        // {
-        //   prop: 'packDevice',
-        //   label: '打包设备',
-        //   formatter: (row) => (row.packDevice ? '有' : '无')
-        // },
-        // {
-        //   prop: 'arrestPoint',
-        //   label: '快递驻点',
-        //   formatter: (row) => (row.arrestPoint ? '有' : '无')
-        // },
-        // {
-        //   prop: 'exportFile',
-        //   label: '出口备案',
-        //   formatter: (row) => (row.exportFile ? '有' : '无')
-        // },
         {
           prop: 'state',
           label: '状态',
@@ -231,6 +227,7 @@ export default {
             )
           }
         },
+        ...sendMsg,
         {
           label: '操作',
           render: (h, scope) => {
@@ -458,12 +455,14 @@ export default {
   },
   methods: {
     async getBaseList() {
-      const { isAuditor, currentPage, pageSize, bId } = this
+      this.loading = true
+      const { isAuditor, currentPage, pageSize, bId, unitId } = this
       const { rows, records } = isAuditor
         ? await queryBaseByRegionCode({ page: currentPage, pageSize, bId })
-        : await queryBase({ page: currentPage, pageSize, bId })
+        : await queryBase({ page: currentPage, pageSize, bId, unitId })
       this.tableData = rows
       this.total = records
+      this.loading = false
     },
     handleCurrentChange(val) {
       this.currentPage = val
@@ -471,6 +470,7 @@ export default {
     },
     openDialogForm() {
       this.formData = {}
+      this.formDisabled = false
       this.dialogFormVisible = true
     },
     handleSubmit(data) {
@@ -512,6 +512,12 @@ export default {
         delete obj.detail
       }
       obj.state = 1
+
+      // 如果是省级直接新增，需要加上unitId
+      if (this.unitId) {
+        obj.unitId = this.unitId
+      }
+
       return obj
     },
     handleSuccess(data) {
@@ -520,7 +526,9 @@ export default {
       this.getBaseList()
       this.$message.success('基地提交成功，进入待审核状态')
     },
-
+    handleRequestError(err) {
+      this.$message.error(err)
+    },
     toBaseForm(row) {
       // 除了退回再修改，提交后不让编辑
       if (row.state !== 3) {
@@ -581,6 +589,14 @@ export default {
           this.getBaseList()
         }
       })
+    },
+    async sendMsgToBase(id) {
+      try {
+        const res = await sendBaseMsg({ id })
+        this.$message(res.data.info)
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }

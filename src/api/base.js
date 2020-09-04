@@ -210,3 +210,12 @@ export function getUnitIndustry(params) {
     params
   })
 }
+
+// 给基地发送账号已开通的短信 id 基地Id
+export function sendBaseMsg(data) {
+  return request({
+    url: '/base/sendBaseMsg',
+    method: 'post',
+    data
+  })
+}

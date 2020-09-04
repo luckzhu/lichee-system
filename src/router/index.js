@@ -239,6 +239,13 @@ export const asyncRoutes = [
         name: 'EnterpriseInfo',
         component: () => import('@/views/provincial/enterpriseInfo'),
         meta: { title: '企业信息', icon: 'info' }
+      },
+      {
+        path: 'base/:id',
+        name: 'ProvincialBase',
+        hidden: true,
+        component: () => import('@/views/provincial/base'),
+        meta: { title: '基地信息', icon: 'survey' }
       }
     ]
   },
