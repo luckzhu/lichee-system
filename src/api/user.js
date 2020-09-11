@@ -96,3 +96,12 @@ export function syncAccount(data) {
   })
 }
 
+// 添加备注 id remark type 1-企业 2-基地
+export function addOrUpdateRemark(data) {
+  return request({
+    url: '/user/addOrUpdateRemark',
+    method: 'post',
+    data
+  })
+}
+

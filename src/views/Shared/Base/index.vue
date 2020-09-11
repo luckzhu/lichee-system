@@ -59,6 +59,25 @@
         <el-button :disabled="approved" :loading="btnLoading" type="danger" @click="sendBack">退回</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog
+      title="备注"
+      :visible.sync="dialogVisible"
+      width="40%"
+      :close-on-click-modal="false"
+    >
+      <span>
+        <el-input
+          :key="unitId"
+          v-model="remark"
+          type="textarea"
+          :autosize="{ minRows: 5}"
+          placeholder="请输入内容"
+        /></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="updateRemark">更新备注</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -66,6 +85,7 @@
 import LbTable from '@/components/LbTable'
 import { stateMap } from '@/utils/submit'
 import { queryRegion } from '@/api/normal'
+import { addOrUpdateRemark } from '@/api/user'
 import {
   queryBase,
   addBase,
@@ -118,7 +138,10 @@ export default {
       formDisabled: false,
       approved: false,
       btnLoading: false,
-      loading: false
+      loading: false,
+      dialogVisible: false,
+      remark: null,
+      baseId: -1
     }
   },
   computed: {
@@ -128,11 +151,15 @@ export default {
       const sendMsg = []
       if (this.sendMsgVisible) {
         sendMsg.push({
-          label: '短信',
-          width: '100px',
+          label: '省级操作',
+          width: '220px',
           render: (h, scope) => {
+            const { id, remark } = scope.row
             return (
-              <el-button type='warning' onClick={() => this.sendMsgToBase(scope.row.id)}>发送短信</el-button>
+              <div>
+                <el-button type='warning' onClick={() => this.sendMsgToBase(id)}>发送短信</el-button>
+                <el-button type='info' onClick={() => this.openRemark(id, remark)} >添加备注</el-button>
+              </div>
             )
           }
         })
@@ -199,6 +226,11 @@ export default {
           }
         },
         {
+          label: '备注',
+          prop: 'remark',
+          minWidth: '200px'
+        },
+        {
           prop: 'haveAccount',
           label: '基地账号',
           renderHeader: (h, scope) => {
@@ -243,6 +275,7 @@ export default {
                 >
                   {this.isAuditor && scope.row.state !== 2 ? '审核' : '查看'}
                 </el-button>
+
               </div>
             )
           }
@@ -596,6 +629,22 @@ export default {
         this.$message(res.data.info)
       } catch (err) {
         console.log(err)
+      }
+    },
+    openRemark(id, remark) {
+      this.baseId = id
+      this.dialogVisible = true
+      remark
+        ? this.remark = remark
+        : ''
+    },
+    async updateRemark() {
+      const { baseId, remark } = this
+      const res = await addOrUpdateRemark({ id: baseId, remark, type: 2 })
+      if (res.code === 200) {
+        this.$message.success('更新成功')
+        this.getBaseList()
+        this.dialogVisible = false
       }
     }
   }

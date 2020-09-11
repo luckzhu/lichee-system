@@ -22,6 +22,12 @@
           @select="handleSelect"
         />
       </div>
+      <div class="filter">
+        <el-select v-model="category" @change="onChangeBId">
+          <el-option v-for="(value,key) in allBreedMap" :key="key" :value="key" :label="value.name" />
+        </el-select>
+      </div>
+
     </div>
     <lb-table
       ref="brandTable"
@@ -39,12 +45,32 @@
       @p-current-change="handleCurrentChange"
     />
 
+    <el-dialog
+      title="备注"
+      :visible.sync="dialogVisible"
+      width="40%"
+      :close-on-click-modal="false"
+    >
+      <span>
+        <el-input
+          :key="unitId"
+          v-model="remark"
+          type="textarea"
+          :autosize="{ minRows: 5}"
+          placeholder="请输入内容"
+        /></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="updateRemark">更新备注</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
-import { queryUnit, validUnit } from '@/api/user'
+import { queryUnit, validUnit, addOrUpdateRemark } from '@/api/user'
 import { stateMap } from '@/utils/submit'
+import { allBreedMap } from '@/utils/submit'
 
 export default {
   data() {
@@ -92,6 +118,11 @@ export default {
           minWidth: '100px'
         },
         {
+          label: '备注',
+          prop: 'remark',
+          minWidth: '200px'
+        },
+        {
           prop: 'state',
           label: '状态',
           width: '100px',
@@ -108,11 +139,13 @@ export default {
         },
         {
           label: '操作',
-          width: '280px',
+          width: '360px',
           render: (h, scope) => {
+            const { id, remark } = scope.row
             return (
               <div className='button-group'>
-                <el-button type='warning' onClick={() => this.editUnitBase(scope.row.id)} >查看基地</el-button>
+                <el-button type='warning' onClick={() => this.editUnitBase(id)} >查看基地</el-button>
+                <el-button type='info' onClick={() => this.openRemark(id, remark)} >添加备注</el-button>
                 <el-button
                   type='primary'
                   loading={scope.row === this.currentClick && this.loading}
@@ -145,7 +178,12 @@ export default {
         { value: 3, label: '退回待修改' }
       ],
       searchUnitName: null,
-      tableLoading: false
+      tableLoading: false,
+      dialogVisible: false,
+      remark: null,
+      unitId: -1,
+      allBreedMap,
+      category: 'pomelo'
     }
   },
   computed: {
@@ -166,6 +204,9 @@ export default {
     },
     total() {
       return this.mytableData.length
+    },
+    categoryId() {
+      return allBreedMap[this.category].categoryId
     }
   },
   mounted() {
@@ -174,9 +215,13 @@ export default {
   methods: {
     async getEnterprises() {
       this.tableLoading = true
-      const { rows: data } = await queryUnit({ pageSize: 100000 })
+
+      const { rows: data } = await queryUnit({ pageSize: 100000, bId: this.categoryId })
       this.tableData = data
       this.tableLoading = false
+    },
+    onChangeBId() {
+      this.getEnterprises()
     },
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage
@@ -221,6 +266,22 @@ export default {
       this.$router.push({
         path: `/provincial/base/${id}`
       })
+    },
+    openRemark(id, remark) {
+      this.unitId = id
+      this.dialogVisible = true
+      remark
+        ? this.remark = remark
+        : ''
+    },
+    async updateRemark() {
+      const { unitId, remark } = this
+      const res = await addOrUpdateRemark({ id: unitId, remark, type: 1 })
+      if (res.code === 200) {
+        this.$message.success('更新成功')
+        this.getEnterprises()
+        this.dialogVisible = false
+      }
     }
   }
 }
