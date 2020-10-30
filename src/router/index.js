@@ -81,55 +81,6 @@ export const asyncRoutes = [
       }
     ]
   },
-  // {
-  //   path: '/lichee',
-  //   component: Layout,
-  //   redirect: '/lichee/base',
-  //   alwaysShow: true,
-  //   meta: { title: '广东荔枝', icon: 'lichee', roles: ['nongye', 'jidi'] },
-  //   children: [
-  //     {
-  //       path: 'base',
-  //       name: 'Base',
-  //       component: () => import('@/views/lichee/base'),
-  //       meta: { title: '基地信息登记', icon: 'info', roles: ['nongye'] }
-  //     },
-  //     {
-  //       path: 'brand',
-  //       name: 'Brand',
-  //       // hidden: true,
-  //       component: () => import('@/views/lichee/brand'),
-  //       meta: { title: '品牌标识申领', icon: 'brand', roles: ['nongye'] }
-  //     },
-  //     {
-  //       path: 'contract',
-  //       name: 'Contract',
-  //       // hidden: true,
-  //       component: () => import('@/views/lichee/contract'),
-  //       meta: { title: '合同备案登记', icon: 'register', roles: ['nongye'] }
-  //     },
-  //     {
-  //       path: 'monitor',
-  //       name: 'Monitor',
-  //       component: () => import('@/views/lichee/monitor'),
-  //       meta: { title: '生产供应监测', icon: 'monitor', noCache: true, roles: ['nongye', 'jidi'] }
-  //     },
-  //     {
-  //       path: 'weeklyForm',
-  //       name: 'WeeklyForm',
-  //       hidden: true,
-  //       component: () => import('@/views/lichee/monitor/components/reportsWeekly/form'),
-  //       meta: { title: '周报', activeMenu: '/lichee/monitor' }
-  //     },
-  //     {
-  //       path: 'subsidy',
-  //       name: 'Subsidy',
-  //       // hidden: true,
-  //       component: () => import('@/views/lichee/subsidy'),
-  //       meta: { title: '物流补助核准', icon: 'subsidy', roles: ['nongye'] }
-  //     }
-  //   ]
-  // },
   {
     path: '/form',
     component: Layout,
@@ -149,7 +100,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/lichee/base',
     alwaysShow: true,
-    meta: { title: '广东荔枝', icon: 'lichee', roles: ['lizhi', 'lizhijidi'] },
+    meta: { title: '广东荔枝', icon: 'lichee', roles: ['lizhi', 'lizhijidi', 'shiji', 'shengji', 'xianji'] },
     children: [
       {
         path: 'base',
@@ -168,6 +119,12 @@ export const asyncRoutes = [
         name: 'Monitor',
         component: () => import('@/views/lichee/monitor'),
         meta: { title: '生产供应监测', icon: 'monitor', category: 'lichee', bId: 100, roles: ['lizhi', 'lizhijidi'] }
+      },
+      {
+        path: 'marketing',
+        name: 'Marketing',
+        component: () => import('@/views/lichee/marketing'),
+        meta: { title: '市场营销情况', icon: 'survey', category: 'lichee', bId: 100, roles: ['shiji', 'shengji', 'xianji'] }
       }
     ]
   },

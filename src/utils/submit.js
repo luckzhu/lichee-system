@@ -52,3 +52,12 @@ export const allBreedMap = {
     }
   }
 }
+
+export const marketingState = {
+  0: '保存',
+  1: '省级退回',
+  2: '市级退回',
+  5: '提交',
+  8: '市级审核通过',
+  9: '省级审核通过'
+}
