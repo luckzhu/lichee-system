@@ -112,17 +112,17 @@ export default {
           next: 'nextRecoveryScale'
         },
         {
-          label: '成花率（%）',
-          present: 'flowerRate',
-          next: 'nextFlowerRate'
-        },
-        {
           label: '种植密度（棵/亩）',
           present: 'plantingDensity',
           next: 'nextPlantingDensity'
         },
         {
-          label: '挂果量（个/棵）',
+          label: '成花率（%）',
+          present: 'flowerRate',
+          next: 'nextFlowerRate'
+        },
+        {
+          label: '坐果率（%）',
           present: 'fruitBearing',
           next: 'nextFruitBearing'
         },

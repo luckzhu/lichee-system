@@ -183,7 +183,33 @@ export const asyncRoutes = [
       }
     ]
   },
-
+  {
+    path: '/longan',
+    component: Layout,
+    redirect: '/longan/base',
+    alwaysShow: true,
+    meta: { title: '广东龙眼', icon: 'longan', roles: ['longyan', 'longyanjidi'] },
+    children: [
+      {
+        path: 'base',
+        name: 'Base',
+        component: () => import('@/views/longan/base'),
+        meta: { title: '基地信息登记', icon: 'info', roles: ['longyan'] }
+      },
+      {
+        path: 'survey',
+        name: 'Survey',
+        component: () => import('@/views/longan/survey'),
+        meta: { title: '基地生产调查', icon: 'survey', roles: ['longyan'] }
+      },
+      {
+        path: 'monitor',
+        name: 'Monitor',
+        component: () => import('@/views/longan/monitor'),
+        meta: { title: '生产供应监测', icon: 'monitor', category: 'longan', bId: 400, roles: ['longyan', 'longyanjidi'] }
+      }
+    ]
+  },
   {
     path: '/provincial',
     component: Layout,

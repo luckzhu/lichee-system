@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { queryRegion } from '@/api/normal'
+import { queryRegion, queryBreed } from '@/api/normal'
 import { register, checkOrgCode } from '@/api/user'
 
 export default {
@@ -151,11 +151,12 @@ export default {
             return value.join(',')
           },
           required: true,
-          options: [
-            { text: '荔枝', value: 100 },
-            { text: '柚子', value: 200 },
-            { text: '柑桔橙', value: 300 }
-          ]
+          options: async() => {
+            const { rows } = await queryBreed({ level: 1 })
+            return rows.map(item => {
+              return { text: item.name, value: item.code }
+            })
+          }
         },
         contactName: {
           type: 'input',

@@ -50,6 +50,14 @@ export const allBreedMap = {
       307: '春甜桔',
       308: '蜜橘'
     }
+  },
+  longan: {
+    name: '龙眼',
+    categoryId: 400,
+    bIds: {
+      401: '石硖',
+      402: '储良'
+    }
   }
 }
 
