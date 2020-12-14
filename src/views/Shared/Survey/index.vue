@@ -3,23 +3,25 @@
     <table
       v-if="isRenderTable"
       class="table table-border table-bordered text-c"
-      style=" margin-bottom: 60px;white-space: nowrap"
+      style="margin-bottom: 60px; white-space: nowrap"
     >
       <tr>
         <td colspan="2">指标（2020年为预计数目）</td>
-        <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">{{ breed }}</td>
+        <td v-for="(breed, key) in categoryAndBreed.bIds" :key="key">
+          {{ breed }}
+        </td>
       </tr>
       <template v-for="item in indicator">
-        <tr :key="item.label+'present'">
+        <tr :key="item.label + 'present'">
           <td rowspan="2">{{ item.label }}</td>
           <td>2019年</td>
-          <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
+          <td v-for="(breed, key) in categoryAndBreed.bIds" :key="key">
             <template v-if="item.type === 'date'">
               <el-date-picker
                 v-model="tableData[key][item.present]"
                 type="date"
                 placeholder="选择日期"
-                style="width:150px"
+                style="width: 150px"
                 value-format="yyyy-MM-dd"
               />
             </template>
@@ -27,20 +29,22 @@
               <el-input-number
                 v-model="tableData[key][item.present]"
                 :controls="false"
-                style="width:150px"
+                :min="0"
+                :max="item.max || Infinity"
+                style="width: 150px"
               />
             </template>
           </td>
         </tr>
-        <tr :key="item.label+'next'">
+        <tr :key="item.label + 'next'">
           <td>2020年</td>
-          <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
+          <td v-for="(breed, key) in categoryAndBreed.bIds" :key="key">
             <template v-if="item.type === 'date'">
               <el-date-picker
                 v-model="tableData[key][item.next]"
                 type="date"
                 placeholder="选择日期"
-                style="width:150px"
+                style="width: 150px"
                 value-format="yyyy-MM-dd"
               />
             </template>
@@ -48,7 +52,9 @@
               <el-input-number
                 v-model="tableData[key][item.next]"
                 :controls="false"
-                style="width:150px"
+                :min="0"
+                :max="item.max || Infinity"
+                style="width: 150px"
               />
             </template>
           </td>
@@ -61,11 +67,11 @@
 
       <tr v-for="item in indicatorPart2.children" :key="item.field">
         <td>{{ item.label }}</td>
-        <td v-for="(breed,key) in categoryAndBreed.bIds" :key="key">
+        <td v-for="(breed, key) in categoryAndBreed.bIds" :key="key">
           <el-input-number
             v-model="tableData[key][item.field]"
             :controls="false"
-            style="width:150px"
+            style="width: 150px"
           />
         </td>
       </tr>
@@ -119,12 +125,14 @@ export default {
         {
           label: '成花率（%）',
           present: 'flowerRate',
-          next: 'nextFlowerRate'
+          next: 'nextFlowerRate',
+          max: 100
         },
         {
           label: '坐果率（%）',
           present: 'fruitBearing',
-          next: 'nextFruitBearing'
+          next: 'nextFruitBearing',
+          max: 100
         },
         {
           label: '上市时间',
