@@ -7,6 +7,15 @@
       border
       align="center"
       :cell-class-name="cellClass"
+      pagination
+      layout="total, sizes, prev, pager, next, jumper"
+      :page-sizes="[10,50,200,500]"
+      :pager-count="5"
+      :current-page.sync="page"
+      :total="total"
+      :page-size="pageSize"
+      @size-change="handleSizeChange"
+      @p-current-change="handleCurrentChange"
     />
     <router-view />
   </div>
@@ -26,7 +35,10 @@ export default {
   },
   data() {
     return {
-      tableData: []
+      tableData: [],
+      page: 1,
+      pageSize: 10,
+      total: 0
     }
   },
   computed: {
@@ -132,19 +144,30 @@ export default {
       })
     },
     async getIssue() {
-      const { bId } = this
+      const { bId, page, pageSize } = this
       if (this.isBase) {
-        const { rows } = await queryIssueByBaseId({ bId, pageSize: 10000 })
+        const { rows, records } = await queryIssueByBaseId({ bId, page, pageSize })
         this.tableData = rows
+        this.total = records
       } else {
-        const { rows } = await queryIssueByUnitId({ bId, pageSize: 10000 })
+        const { rows, records } = await queryIssueByUnitId({ bId, page, pageSize })
         this.tableData = rows
+        this.total = records
       }
     },
     cellClass({ row, column, rowIndex, columnIndex }) {
       if (row.currIssue === 1) {
         return 'currIssue'
       }
+    },
+    handleCurrentChange(currentPage) {
+      this.page = currentPage
+      this.getIssue()
+    },
+    handleSizeChange(val) {
+      this.page = 1
+      this.pageSize = val
+      this.getIssue()
     }
   }
 }
