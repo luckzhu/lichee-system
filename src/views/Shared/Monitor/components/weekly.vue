@@ -134,10 +134,10 @@ export default {
     async getIssue() {
       const { bId } = this
       if (this.isBase) {
-        const { rows } = await queryIssueByBaseId({ bId })
+        const { rows } = await queryIssueByBaseId({ bId, pageSize: 10000 })
         this.tableData = rows
       } else {
-        const { rows } = await queryIssueByUnitId({ bId })
+        const { rows } = await queryIssueByUnitId({ bId, pageSize: 10000 })
         this.tableData = rows
       }
     },
