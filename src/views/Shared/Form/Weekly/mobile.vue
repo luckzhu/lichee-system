@@ -11,7 +11,7 @@
         <td>数值</td>
       </tr>
       <tr>
-        <td rowspan="7">{{ breed.name }}</td>
+        <td rowspan="6">{{ breed.name }}</td>
         <td colspan="2">是否上市</td>
         <td>
           <div>
@@ -23,8 +23,8 @@
         </td>
       </tr>
       <tr>
-        <td rowspan="3" style="width:20px">本周上市情况</td>
-        <td>基地本周上市量（公斤）</td>
+        <td rowspan="3" style="width:40px">{{ `上周上市情况（从${dayjs(issue.dataBegin).format('YYYY-MM-DD')}至${dayjs(issue.dataEnd).format('YYYY-MM-DD')}）` }}</td>
+        <td>基地上周上市量（公斤）</td>
         <td>
           <el-input-number
             v-model="breed.d1"
@@ -57,8 +57,8 @@
         </td>
       </tr>
       <tr>
-        <td rowspan="3">下周预计上市情况</td>
-        <td>预计下周价格（元/公斤）</td>
+        <td rowspan="2">{{ `本周预计上市情况（从${dayjs(issue.dataBegin).add(7, 'day').format('YYYY-MM-DD')}至${dayjs(issue.dataEnd).add(7, 'day').format('YYYY-MM-DD')}）` }}</td>
+        <td>预计本周价格（元/公斤）</td>
         <td>
           <el-input-number
             v-model="breed.d4"
@@ -69,7 +69,7 @@
         </td>
       </tr>
       <tr>
-        <td>预计下周基地上市量（公斤）</td>
+        <td>预计本周基地上市量（公斤）</td>
         <td>
           <el-input-number
             v-model="breed.d5"
@@ -79,7 +79,7 @@
           />
         </td>
       </tr>
-      <tr>
+      <!-- <tr>
         <td>行情预判</td>
         <td>
           <el-select v-model="breed.i2" :disabled="breed.i1 === 0">
@@ -88,20 +88,23 @@
             <el-option :value="3" label="下跌" />
           </el-select>
         </td>
-      </tr>
+      </tr> -->
     </table>
   </div>
 </template>
 
 <script>
-
+import dayjs from 'dayjs'
 export default {
   props: {
     // eslint-disable-next-line
-    tableData: { type: Array }
+    tableData: { type: Array },
+    issue: { type: Object, default: () => {} }
   },
   data() {
-    return {}
+    return {
+      dayjs
+    }
   }
 }
 </script>

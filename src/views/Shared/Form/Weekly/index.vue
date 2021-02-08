@@ -9,10 +9,10 @@
         生产基地：
         <span>{{ baseinfo.name }}</span>
       </p>
-      <p>
+      <!-- <p>
         数据计算时间：
         <span>{{ issue.dataBegin }} 至 {{ issue.dataEnd }}</span>
-      </p>
+      </p> -->
       <p>
         报送截止时间：
         <span>{{ issue.endTime }}</span>
@@ -27,7 +27,7 @@
         align="center"
       />
 
-      <table-mobile v-else class="table-mobile" :table-data="tableData" />
+      <table-mobile v-else class="table-mobile" :table-data="tableData" :issue="issue" />
 
       <table class="table table-border table-bordered text-c breed-table content">
         <tr>
@@ -59,6 +59,7 @@ import { addOrUpdateBaseData, getBaseDataByIssueId } from '@/api/task'
 import { allBreedMap } from '@/utils/submit'
 import { mapGetters } from 'vuex'
 import TableMobile from './mobile'
+import dayjs from 'dayjs'
 
 export default {
   name: 'Form',
@@ -68,7 +69,37 @@ export default {
   },
   data() {
     return {
-      tableDesc: [
+      tableData: [],
+      issue: {
+        state: null,
+        content: null
+      },
+      baseinfo: {},
+      breed: [],
+      btnLoading: false
+    }
+  },
+  computed: {
+    ...mapGetters(['device']),
+    id() {
+      return this.$route.query.id
+    },
+    disabled() {
+      const { state } = this.issue
+      if (state === -1 || state === 0 || state === 3) {
+        return false
+      } else {
+        return true
+      }
+    },
+    category() {
+      return this.$route.params.category
+    },
+    breedMap() {
+      return allBreedMap[this.category].bIds
+    },
+    tableDesc() {
+      return [
         {
           prop: 'name',
           label: '品种',
@@ -94,10 +125,10 @@ export default {
           }
         },
         {
-          label: '本周上市情况',
+          label: `上周上市情况（从${dayjs(this.issue.dataBegin).format('YYYY-MM-DD')}至${dayjs(this.issue.dataEnd).format('YYYY-MM-DD')}）`,
           children: [
             {
-              label: '基地本周上市量（公斤）',
+              label: '基地上周上市量（公斤）',
               prop: 'd1',
               align: 'center',
               render: (h, scope) => {
@@ -153,10 +184,10 @@ export default {
           ]
         },
         {
-          label: '下周预计上市情况',
+          label: `本周预计上市情况（从${dayjs(this.issue.dataBegin).add(7, 'day').format('YYYY-MM-DD')}至${dayjs(this.issue.dataEnd).add(7, 'day').format('YYYY-MM-DD')}）`,
           children: [
             {
-              label: '预计下周价格（元/公斤）',
+              label: '预计本周价格（元/公斤）',
               prop: 'd4',
               align: 'center',
               render: (h, scope) => {
@@ -174,7 +205,7 @@ export default {
               }
             },
             {
-              label: '预计下周基地上市量（公斤）',
+              label: '预计本周基地上市量（公斤）',
               prop: 'd5',
               align: 'center',
               render: (h, scope) => {
@@ -192,55 +223,27 @@ export default {
               }
             }
           ]
-        },
-        {
-          prop: 'i2',
-          label: '行情预判',
-          width: '240px',
-          render: (h, scope) => {
-            return (
-              <div>
-                <el-radio-group
-                  v-model={scope.row.i2}
-                  disabled={!scope.row.i1 || this.disabled}
-                >
-                  <el-radio label={1}>上涨 </el-radio>
-                  <el-radio label={2}>持平</el-radio>
-                  <el-radio label={3}>下跌</el-radio>
-                </el-radio-group>
-              </div>
-            )
-          }
         }
-      ],
-      tableData: [],
-      issue: {
-        state: null,
-        content: null
-      },
-      baseinfo: {},
-      breed: [],
-      btnLoading: false
-    }
-  },
-  computed: {
-    ...mapGetters(['device']),
-    id() {
-      return this.$route.query.id
-    },
-    disabled() {
-      const { state } = this.issue
-      if (state === -1 || state === 0 || state === 3) {
-        return false
-      } else {
-        return true
-      }
-    },
-    category() {
-      return this.$route.params.category
-    },
-    breedMap() {
-      return allBreedMap[this.category].bIds
+        // {
+        //   prop: 'i2',
+        //   label: '行情预判',
+        //   width: '240px',
+        //   render: (h, scope) => {
+        //     return (
+        //       <div>
+        //         <el-radio-group
+        //           v-model={scope.row.i2}
+        //           disabled={!scope.row.i1 || this.disabled}
+        //         >
+        //           <el-radio label={1}>上涨 </el-radio>
+        //           <el-radio label={2}>持平</el-radio>
+        //           <el-radio label={3}>下跌</el-radio>
+        //         </el-radio-group>
+        //       </div>
+        //     )
+        //   }
+        // }
+      ]
     }
   },
   mounted() {
@@ -296,8 +299,8 @@ export default {
         { field: 'd2', label: '基地田头大宗最高价' },
         { field: 'd3', label: '基地田头大宗最低价' },
         { field: 'd4', label: '预计下周价格' },
-        { field: 'd5', label: '预计下周基地上市量' },
-        { field: 'i2', label: '行情预判' }
+        { field: 'd5', label: '预计下周基地上市量' }
+        // { field: 'i2', label: '行情预判' }
       ]
 
       const isBiggerThanZero = [
@@ -371,7 +374,7 @@ export default {
           delete item.d3
           delete item.d4
           delete item.d5
-          delete item.i2
+          // delete item.i2
         }
         item.name = breedMap[item.bId]
         item.biId = id
